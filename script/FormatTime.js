@@ -54,5 +54,12 @@
     return timeInSeconds;
   };
 
-  window.FormatTime = FormatTime;
+  if ( typeof define === "function" && define.amd ) {
+    define(function() {
+      return FormatTime;
+    });
+  }
+  else {
+    window.FormatTime = FormatTime;
+  }
 })();

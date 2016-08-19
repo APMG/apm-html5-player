@@ -1,11 +1,16 @@
-(function($) {
+(function() {
   // Required modules for page load
   'use strict';
 
 
   // Set up reference to parent module.
   var player;
-
+  if (typeof define === 'function' && define.amd) {
+    // Required Modules
+    define(function (require) {
+      $ = require('jquery');
+    });
+  }
   // Constructor
   // The 'parent' argument passed in is the parent object from Player.js.
   // This script is only intended to be used with that Player.js.
@@ -122,4 +127,4 @@
     window.Playlist = Playlist;
   }
 
-})(jQuery);
+})();

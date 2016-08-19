@@ -53,13 +53,5 @@
       </symbol>
     </svg>
   </body>
-  <script type="text/javascript" charset="utf-8" src='http://code.jquery.com/jquery-3.1.0.slim.min.js'></script>
-  <script type="text/javascript" charset="utf-8" src='../../../script/FormatTime.js'></script>
-  <script type="text/javascript" charset="utf-8" src='../../../script/Player.js'></script>
-  <script type="text/javascript" charset="utf-8" src='../../../script/AudioAnalytics.js'></script>
-  <script type="text/javascript" charset="utf-8">
-    $('.js-player').each(function() {
-      new Player($(this)).init();
-    });
-  </script>
+  <script data-main="scripts/main" src="bower_components/requirejs/require.js"></script>
 </html>
