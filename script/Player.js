@@ -1,15 +1,21 @@
-define(function(require){
+(function($) {
   'use strict';
 
+
+  var formatTime;
   // TODO: Handle missing audio
-  // Required Modules
-  var $ = require('jquery');
-  var FormatTime = require('util/FormatTime');
-  var Playlist = require('Playlist');
-  var Nielsen = require('NielsenSetup'); // eslint-disable-line no-unused-vars
+  if (typeof define === 'function' && define.amd) {
+    // Required Modules
+    var FormatTime = require('FormatTime');
+    var Playlist = require('Playlist');
+    var Nielsen = require('NielsenSetup'); // eslint-disable-line no-unused-vars
+    formatTime = new FormatTime();
+  }
+  else {
+    formatTime = new window.FormatTime();
+  }
 
   // Instantiate Utility Scripts
-  var formatTime = new FormatTime();
 
   // Constants
   var PLAYING_CLASS = 'is-playing';
@@ -35,7 +41,7 @@ define(function(require){
     this.playlistSelector = this.$el.data('playlist');
     this.$playlistElement = $(this.playlistSelector);
     // The playlist module, initialized later
-    this.playlist;
+    this.playlist = null;
     // Set to true when playlist is initialized
     this.hasPlaylist = false;
   };
@@ -428,5 +434,13 @@ define(function(require){
     this.$el.removeClass(MUTED_CLASS);
   };
 
-  return Player;
-});
+  // Support Require.js
+  if ( typeof define === "function" && define.amd ) {
+      define(function() {
+          return Player;
+      });
+  }
+  else {
+      window.Player = Player;
+  }
+})(jQuery);

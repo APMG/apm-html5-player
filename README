@@ -1,0 +1,6 @@
+An HTML 5 audio player supporitng live streams and archived playback.
+Supports variable DOM elements and has features like playlist support
+and scrubbable progress bar.
+
+Requirements
+- jQuery

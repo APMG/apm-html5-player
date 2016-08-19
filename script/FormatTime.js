@@ -1,4 +1,4 @@
-define(function(require){
+(function() {
   'use strict';
 
   // Constructor
@@ -54,5 +54,5 @@ define(function(require){
     return timeInSeconds;
   };
 
-  return FormatTime;
-});
+  window.FormatTime = FormatTime;
+})();

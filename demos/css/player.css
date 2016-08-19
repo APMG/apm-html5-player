@@ -1,0 +1,480 @@
+/* ------------------------
+typographic treatments
+------------------------- */
+@import url("http://fast.fonts.com/cssapi/1b0426f9-ed81-4fce-8ac1-70f4025dbd41.css");
+html {
+  background: #b8a578 image-url("background-site.jpg") repeat;
+  overflow-y: scroll; }
+
+body {
+  background: transparent;
+  font-family: "ITCFranklinGothicW01-Bk 812647", sans-serif; }
+
+p {
+  font-family: "ITCFranklinGothicW01-Bk 812647", sans-serif;
+  line-height: 1.35; }
+  p a:hover {
+    text-decoration: underline; }
+
+h1, h2, h3, h4, h5, h6 {
+  text-rendering: optimizeSpeed;
+  font-weight: normal;
+  color: inherit; }
+
+h1 {
+  font-family: "ITCFranklinGothicW01-Dm 812677", sans-serif; }
+
+h2, h3, h4, h5, h6 {
+  font-family: "ITCFranklinGothicW01-Dm 812677", sans-serif; }
+
+h2 {
+  font-size: 26px; }
+
+h3 {
+  font-size: 20px; }
+
+h4 {
+  font-size: 18px; }
+
+h5, h6 {
+  font-size: 16px; }
+
+ul, ol, dl {
+  line-height: 1.35; }
+
+h1 strong, h1 b, h2 strong, h2 b, h3 strong, h3 b, h4 strong, h4 b, h5 strong, h5 b, h6 strong, h6 b {
+  font-weight: normal; }
+
+.show-on-mobile {
+  display: none !important; }
+
+h5 {
+  margin: 0 0 2px; }
+
+h5.title {
+  color: #ffffff;
+  font-size: 18px; }
+
+h5.artist {
+  color: #222222;
+  font-family: "ITCFranklinGothicW01-Bk 812647", sans-serif;
+  font-size: 16px; }
+
+a:hover h5.title {
+  color: #b70005; }
+
+a.more {
+  font-family: "ITCFranklinGothicW01-Dm 812671", sans-serif;
+  text-transform: uppercase;
+  color: #b70005 !important; }
+  a.more span {
+    color: #222222 !important; }
+  a.more:hover span {
+    color: #b70005 !important; }
+
+ol {
+  margin-left: 0; }
+
+/* forms */
+label {
+  font-family: "ITCFranklinGothicW01-Dm 812677", sans-serif;
+  font-size: 18px; }
+
+dl {
+  line-height: 1.35em; }
+  dl dt {
+    margin-top: 15px;
+    font-family: "ITCFranklinGothicW01-Dm 812677", sans-serif; }
+    dl dt:first-child {
+      margin-top: 0; }
+  dl dd {
+    font-size: 15px; }
+
+input[type=submit] {
+  font-weight: normal;
+  font-family: "ITCFranklinGothicW01-Md 812695", sans-serif; }
+
+/*
+ * This usesthe medium weight to behave as the bold. Ideally, this would be baked into the css we get from fonts.com
+ * But it is not, so we override the output here.
+ * These URLs do not seem to change, and if they do we should fall back with the old-style formatting cleanly.
+ */
+@font-face {
+  font-family: 'ITCFranklinGothicW01-Bk 812647';
+  src: url("http://fast.fonts.com/d/905c1a7c-f018-4815-b4a9-6bd6f4c7e768.eot?d44f19a684109620e484157fa790e818d6a0dc7138d0a76dcc0c1fe83ad1d594119e1e62143e61da83837e1de7e89243f46954367d94959b706fa05e7f2fe8087a37bfc8545ac12911aa7fec61e2ca57259eeec06816b904f7094f9696d27183215e31490b5ebc1a102c8153c8fdcd5d4e830fe588aa584af4c729951a4584958fd3b6b62f67b60019b2d1c77857bf306e7bba469e5cdaaeb6018f35528510bd&projectId=1b0426f9-ed81-4fce-8ac1-70f4025dbd41") format("eot");
+  font-weight: bold; }
+@font-face {
+  font-family: 'ITCFranklinGothicW01-Bk 812647';
+  src: url("http://fast.fonts.com/d/905c1a7c-f018-4815-b4a9-6bd6f4c7e768.eot?d44f19a684109620e484157fa790e818d6a0dc7138d0a76dcc0c1fe83ad1d594119e1e62143e61da83837e1de7e89243f46954367d94959b706fa05e7f2fe8087a37bfc8545ac12911aa7fec61e2ca57259eeec06816b904f7094f9696d27183215e31490b5ebc1a102c8153c8fdcd5d4e830fe588aa584af4c729951a4584958fd3b6b62f67b60019b2d1c77857bf306e7bba469e5cdaaeb6018f35528510bd&projectId=1b0426f9-ed81-4fce-8ac1-70f4025dbd41");
+  src: url("http://fast.fonts.com/d/10ab5970-5726-4843-82b1-912faa9307ff.woff?d44f19a684109620e484157fa790e818d6a0dc7138d0a76dcc0c1fe83ad1d594119e1e62143e61da83837e1de7e89243f46954367d94959b706fa05e7f2fe8087a37bfc8545ac12911aa7fec61e2ca57259eeec06816b904f7094f9696d27183215e31490b5ebc1a102c8153c8fdcd5d4e830fe588aa584af4c729951a4584958fd3b6b62f67b60019b2d1c77857bf306e7bba469e5cdaaeb6018f35528510bd&projectId=1b0426f9-ed81-4fce-8ac1-70f4025dbd41") format("woff"), url("http://fast.fonts.com/d/70a26d03-0393-410a-a98c-e35dc876c3cb.ttf?d44f19a684109620e484157fa790e818d6a0dc7138d0a76dcc0c1fe83ad1d594119e1e62143e61da83837e1de7e89243f46954367d94959b706fa05e7f2fe8087a37bfc8545ac12911aa7fec61e2ca57259eeec06816b904f7094f9696d27183215e31490b5ebc1a102c8153c8fdcd5d4e830fe588aa584af4c729951a4584958fd3b6b62f67b60019b2d1c77857bf306e7bba469e5cdaaeb6018f35528510bd&projectId=1b0426f9-ed81-4fce-8ac1-70f4025dbd41") format("truetype"), url("http://fast.fonts.com/d/edb011f7-44ad-4c0d-b81a-c97c3ad6be6f.svg?d44f19a684109620e484157fa790e818d6a0dc7138d0a76dcc0c1fe83ad1d594119e1e62143e61da83837e1de7e89243f46954367d94959b706fa05e7f2fe8087a37bfc8545ac12911aa7fec61e2ca57259eeec06816b904f7094f9696d27183215e31490b5ebc1a102c8153c8fdcd5d4e830fe588aa584af4c729951a4584958fd3b6b62f67b60019b2d1c77857bf306e7bba469e5cdaaeb6018f35528510bd&projectId=1b0426f9-ed81-4fce-8ac1-70f4025dbd41#edb011f7-44ad-4c0d-b81a-c97c3ad6be6f") format("svg");
+  font-weight: bold; }
+.player {
+  display: table;
+  width: 100%;
+  color: #ffffff; }
+
+.player-main {
+  display: table-row; }
+
+.player-main > * {
+  display: table-cell;
+  vertical-align: middle; }
+
+.player-control {
+  width: 80px;
+  background: #4a4a4a; }
+  @media (min-width: 37.5em) {
+    .player-control {
+      width: 100px;
+      padding: 10px; } }
+
+.player-play,
+.player-pause {
+  display: block;
+  margin: 0 auto;
+  height: 60px;
+  width: 60px;
+  cursor: pointer; }
+  .player-play svg,
+  .player-pause svg {
+    fill: #ffffff;
+    height: 60px;
+    width: 60px;
+    transition: fill .2s; }
+  .player-play:hover svg,
+  .player-pause:hover svg {
+    fill: #ffb7b9; }
+
+.player-pause {
+  display: none; }
+
+.player-compact .player-control {
+  width: 60px; }
+.player-compact .player-play,
+.player-compact .player-pause {
+  height: 40px;
+  width: 40px; }
+  .player-compact .player-play svg,
+  .player-compact .player-pause svg {
+    height: 40px;
+    width: 40px; }
+
+.player-info {
+  padding: 10px;
+  line-height: 1.25;
+  background: #222222; }
+
+.player-label {
+  font-family: "ITCFranklinGothicW01-Dm 812677", sans-serif;
+  font-size: 13px;
+  text-transform: uppercase; }
+
+.player-title {
+  font-family: "ITCFranklinGothicW01-Md 812695", sans-serif; }
+  @media (min-width: 37.5em) {
+    .player-title {
+      font-size: 18px; } }
+
+.player-artist {
+  font-family: "ITCFranklinGothicW01-Bk 812647", sans-serif; }
+  @media (min-width: 37.5em) {
+    .player-artist {
+      font-size: 16px; } }
+
+.player-compact .player-title {
+  font-size: 14px;
+  font-family: "ITCFranklinGothicW01-Bk 812647", sans-serif; }
+.player-compact .player-artist {
+  font-size: 12px; }
+
+.player-sound {
+  padding: 10px 10px 4px;
+  background: #222222;
+  width: 20px; }
+
+.sound-bars {
+  height: 1em;
+  left: 55%;
+  position: absolute;
+  top: 55%;
+  width: 1em; }
+
+.player-volume {
+  display: block; }
+
+.player-volume-level {
+  width: 20px;
+  height: 29px;
+  background: image-url("volume-bar-bg.svg") repeat bottom transparent;
+  position: relative;
+  cursor: pointer; }
+  @media (min-width: 37.5em) {
+    .player-volume-level {
+      height: 38px; } }
+
+.player-volume-current {
+  width: 100%;
+  height: 100%;
+  background: image-url("volume-bar.svg") repeat bottom transparent;
+  position: absolute;
+  bottom: 0; }
+
+.player-volume-mute {
+  cursor: pointer; }
+  @media (min-width: 37.5em) {
+    .player-volume-mute {
+      padding-top: 4px;
+      padding-bottom: 3px; } }
+
+.player-unmuted,
+.player-muted {
+  display: block;
+  height: 20px;
+  width: 20px;
+  fill: #ffffff; }
+
+.player-muted {
+  display: none; }
+
+.is-muted .player-unmuted {
+  display: none; }
+.is-muted .player-muted {
+  display: block; }
+
+.player-banner {
+  display: table-row;
+  background: #222222;
+  transition: background-color .4s, color .4s; }
+
+.player-banner > * {
+  display: table-cell;
+  padding: 3px 10px;
+  border-top: 1px solid #ffffff;
+  vertical-align: middle;
+  font-family: "ITCFranklinGothicW01-Dm 812677", sans-serif; }
+
+.player-banner-label {
+  padding-left: 0;
+  padding-right: 0;
+  text-align: center; }
+
+.player-banner-info {
+  display: table-cell; }
+
+.player-timeline {
+  height: 0;
+  width: 100%;
+  position: relative;
+  background: #222222;
+  overflow: hidden;
+  cursor: pointer;
+  transition: height .4s; }
+
+.is-paused .player-timeline,
+.is-playing .player-timeline {
+  border-top: 1px solid #ffffff;
+  height: 16px; }
+  @media (max-width: 32em) {
+    .is-paused .player-timeline,
+    .is-playing .player-timeline {
+      height: 20px; } }
+
+.player-time {
+  font-size: 12px;
+  color: #ffffff;
+  position: absolute;
+  right: 4px;
+  top: 1px;
+  pointer-events: none; }
+
+.player-progress {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  background: #b70005; }
+
+.player-wave-container {
+  display: table-cell;
+  padding-top: 0;
+  padding-bottom: 0; }
+
+.player-wave {
+  position: relative;
+  height: 14px;
+  margin-top: 2px; }
+  .player-wave span {
+    background: #ffffff;
+    opacity: .5;
+    bottom: 0;
+    height: 20%;
+    position: absolute;
+    width: 4px;
+    transition: opacity .25s, height .25s, background-color .4s; }
+    .player-wave span:nth-child(1) {
+      left: 0; }
+    .player-wave span:nth-child(2) {
+      left: 5px; }
+    .player-wave span:nth-child(3) {
+      left: 10px; }
+    .player-wave span:nth-child(4) {
+      left: 15px; }
+
+.is-playing .player-wave span,
+.is-paused .player-wave span {
+  animation: sound1 1000ms -800ms linear infinite normal;
+  opacity: .8; }
+  .is-playing .player-wave span:nth-child(1),
+  .is-paused .player-wave span:nth-child(1) {
+    animation-duration: 780ms;
+    animation-name: sound1;
+    height: 75%; }
+  .is-playing .player-wave span:nth-child(2),
+  .is-paused .player-wave span:nth-child(2) {
+    animation-duration: 750ms;
+    animation-name: sound2;
+    height: 50%; }
+  .is-playing .player-wave span:nth-child(3),
+  .is-paused .player-wave span:nth-child(3) {
+    animation-duration: 790ms;
+    animation-name: sound3;
+    height: 100%; }
+  .is-playing .player-wave span:nth-child(4),
+  .is-paused .player-wave span:nth-child(4) {
+    animation-duration: 760ms;
+    animation-name: sound4;
+    height: 70%; }
+.is-playing .player-banner,
+.is-paused .player-banner {
+  background-color: #b70005; }
+
+.is-loading .player-wave span {
+  animation: loading1 500ms linear infinite normal;
+  height: 100%; }
+  .is-loading .player-wave span:nth-child(1) {
+    animation-name: loading1;
+    animation-duration: 500ms;
+    height: 100%; }
+  .is-loading .player-wave span:nth-child(2) {
+    animation-name: loading2;
+    animation-duration: 500ms;
+    height: 100%; }
+  .is-loading .player-wave span:nth-child(3) {
+    animation-name: loading3;
+    animation-duration: 500ms;
+    height: 100%; }
+  .is-loading .player-wave span:nth-child(4) {
+    animation-name: loading4;
+    animation-duration: 500ms;
+    height: 100%; }
+
+.is-playing .player-play {
+  display: none; }
+.is-playing .player-pause {
+  display: block; }
+
+.is-paused .player-wave span {
+  animation: none; }
+
+@keyframes loading1 {
+  0% {
+    opacity: 1; }
+  25% {
+    opacity: .5; }
+  50% {
+    opacity: .5; }
+  75% {
+    opacity: .5; } }
+@keyframes loading2 {
+  0% {
+    opacity: .5; }
+  25% {
+    opacity: 1; }
+  50% {
+    opacity: .5; }
+  75% {
+    opacity: .5; } }
+@keyframes loading3 {
+  0% {
+    opacity: .5; }
+  25% {
+    opacity: .5; }
+  50% {
+    opacity: 1; }
+  75% {
+    opacity: .5; } }
+@keyframes loading4 {
+  0% {
+    opacity: .5; }
+  25% {
+    opacity: .5; }
+  50% {
+    opacity: .5; }
+  75% {
+    opacity: 1; } }
+@keyframes sound1 {
+  0% {
+    height: 20%; }
+  20% {
+    height: 27%; }
+  28% {
+    height: 20%; }
+  50% {
+    height: 80%; }
+  52% {
+    height: 20%; }
+  85% {
+    height: 60%; }
+  100% {
+    height: 20%; } }
+@keyframes sound2 {
+  0% {
+    height: 20%; }
+  20% {
+    height: 35%; }
+  24% {
+    height: 20%; }
+  40% {
+    height: 100%; }
+  48% {
+    height: 20%; }
+  70% {
+    height: 90%; }
+  100% {
+    height: 20%; } }
+@keyframes sound3 {
+  0% {
+    height: 20%; }
+  20% {
+    height: 40%; }
+  24% {
+    height: 20%; }
+  50% {
+    height: 80%; }
+  58% {
+    height: 20%; }
+  75% {
+    height: 100%; }
+  100% {
+    height: 20%; } }
+@keyframes sound4 {
+  0% {
+    height: 20%; }
+  20% {
+    height: 30%; }
+  24% {
+    height: 20%; }
+  40% {
+    height: 50%; }
+  48% {
+    height: 20%; }
+  70% {
+    height: 80%; }
+  78% {
+    height: 20%; }
+  90% {
+    height: 65%; }
+  100% {
+    height: 20%; } }
+
+/*# sourceMappingURL=player.css.map */
