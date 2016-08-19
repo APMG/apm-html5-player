@@ -3,16 +3,18 @@
 
 
   var formatTime;
+  var Playlist;
   // TODO: Handle missing audio
   if (typeof define === 'function' && define.amd) {
     // Required Modules
     var FormatTime = require('FormatTime');
-    var Playlist = require('Playlist');
+    Playlist = require('Playlist');
     var Nielsen = require('NielsenSetup'); // eslint-disable-line no-unused-vars
     formatTime = new FormatTime();
   }
   else {
     formatTime = new window.FormatTime();
+    Playlist = window.Playlist;
   }
 
   // Instantiate Utility Scripts
@@ -41,7 +43,7 @@
     this.playlistSelector = this.$el.data('playlist');
     this.$playlistElement = $(this.playlistSelector);
     // The playlist module, initialized later
-    this.playlist = null;
+    this.playlist;
     // Set to true when playlist is initialized
     this.hasPlaylist = false;
   };

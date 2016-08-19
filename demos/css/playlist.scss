@@ -1,0 +1,92 @@
+$red: #b70005;
+$text: #222222;
+$light-grey: #e5e5e5;
+$med-grey: #c6c6c6;
+$dark-grey: #565656;
+$darker-grey: #4a4a4a;
+$brown: #634a1b;
+$white: #ffffff;
+$black: #000000;
+$green: #7fae00;
+
+$franklinBook: 'ITCFranklinGothicW01-Bk 812647', sans-serif;
+$franklinMedium: 'ITCFranklinGothicW01-Md 812695', sans-serif;
+$franklinCondensedDemi: 'ITCFranklinGothicW01-Dm 812677', sans-serif;
+$franklinCompressedDemi: 'ITCFranklinGothicW01-Dm 812671', sans-serif;
+
+.story-playlist {
+  display: table;
+  width: 100%;
+
+  > li {
+    display: table-row;
+    list-style: none;
+    cursor: pointer;
+    font-size: 14px;
+    background: $light-grey;
+
+    > * {
+      display: table-cell;
+      vertical-align: middle;
+      padding: 2px;
+      border-top: 1px solid $white;
+    }
+
+    &:hover {
+      background: $med-grey;
+    }
+
+    .story-playlist-listen {
+      padding: 2px 5px;
+
+      svg {
+        display: block;
+        fill: $dark-grey;
+        vertical-align: middle;
+      }
+    }
+
+    .story-playlist-text {
+      font-size: 14px;
+    }
+
+    .story-playlist-text-duration {
+      display: inline-block;
+      margin-right: 5px;
+      font-size: 12px;
+      font-style: italic;
+      color: $dark-grey;
+    }
+
+    .story-playlist-playing {
+      padding: 2px 5px;
+      opacity: 0;
+    }
+
+    .player-wave-container {
+      width: 26px;
+    }
+
+    .player-wave {
+      display: none;
+    }
+
+    &.is-playing {
+      background: $red;
+      color: $white;
+
+      .player-wave {
+        display: block;
+      }
+
+      svg {
+        fill: $white;
+      }
+
+      .story-playlist-text-duration {
+        color: $white;
+        opacity: .8;
+      }
+    }
+  }
+}

@@ -1,0 +1,65 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <title>Simple APM HTML5 Player Demo</title>
+    <link rel="stylesheet" href="../css/player.css"/>
+  </head>
+  <body>
+    <div class="story-audio">
+      <div class="js-player is-paused" data-src="http://play.publicradio.org/mprstory/o/minnesota/the_current/features/2016/08/17/20160817_kieran_folliard_the_commitments_20160817_128.mp3" data-playlist="#js-storyPlaylist">
+        <div class="player player-compact">
+          <audio src=''></audio>
+          <div class="player-main">
+            <div class="player-control js-player-play">
+              <div class="player-play">
+                <svg viewBox="0 0 24 24">
+                  <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#svg-play"></use>
+                </svg>
+              </div>
+              <div class="player-pause">
+                <svg viewBox="0 0 24 24">
+                  <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#svg-pause"></use>
+                </svg>
+              </div>
+            </div>
+            <div class="player-info">
+              <div class="player-label">Listen:</div>
+              <div class="player-title js-player-title js-update-title">Kieran Folliard reflects on 'The Commitments'</div>
+              <div class="player-artist js-player-artist js-update-artist"></div>
+            </div>
+          </div>
+        </div>
+        <div class="player-timeline js-player-timeline">
+          <div class="player-progress js-player-progress" style="width: 0%;"></div>
+          <div class="player-time">
+            <span class="player-time-current js-player-currentTime">0:00</span>
+            |
+            <span class="player-time-duration js-player-duration">3:07</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <svg style="display:none;">
+      <symbol id="svg-play" viewBox="0 0 24 24">
+      <path d="M0 0h24v24H0z" fill="none"/>
+      <path d="M10 16.5l6-4.5-6-4.5v9zM12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/>
+      </symbol>
+    </svg>
+    <svg style="display:none;">
+      <symbol id="svg-pause" viewBox="0 0 24 24">
+      <path d="M0 0h24v24H0z" fill="none"/>
+      <path d="M9 16h2V8H9v8zm3-14C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm1-4h2V8h-2v8z"/>
+      </symbol>
+    </svg>
+  </body>
+  <script type="text/javascript" charset="utf-8" src='http://code.jquery.com/jquery-3.1.0.slim.min.js'></script>
+  <script type="text/javascript" charset="utf-8" src='../../../script/FormatTime.js'></script>
+  <script type="text/javascript" charset="utf-8" src='../../../script/Player.js'></script>
+  <script type="text/javascript" charset="utf-8" src='../../../script/AudioAnalytics.js'></script>
+  <script type="text/javascript" charset="utf-8">
+    $('.js-player').each(function() {
+      new Player($(this)).init();
+    });
+  </script>
+</html>

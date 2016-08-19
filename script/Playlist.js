@@ -1,9 +1,7 @@
-// Required modules for page load
-define(function(require, exports, module) { // eslint-disable-line
+(function($) {
+  // Required modules for page load
   'use strict';
 
-  // Require external modules
-  var $ = require('jquery');
 
   // Set up reference to parent module.
   var player;
@@ -23,8 +21,8 @@ define(function(require, exports, module) { // eslint-disable-line
 
   Playlist.prototype.init = function() {
     this.selectElements()
-        .setNextItem()
-        .bindEventHandlers();
+    .setNextItem()
+    .bindEventHandlers();
   };
 
   Playlist.prototype.selectElements = function() {
@@ -114,6 +112,14 @@ define(function(require, exports, module) { // eslint-disable-line
     player.$artist.text(artist);
   };
 
-  return Playlist;
+  // Support Require.js
+  if ( typeof define === "function" && define.amd ) {
+    define(function() {
+      return Playlist;
+    });
+  }
+  else {
+    window.Playlist = Playlist;
+  }
 
-});
+})(jQuery);
