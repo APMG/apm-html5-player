@@ -427,28 +427,29 @@
   };
 
   return function($, el) {
-      var formatTime;
-      var Playlist;
-      // TODO: Handle missing audio
-      if (typeof define === 'function' && define.amd) {
-        // Required Modules
-        define(['require', 'playlist', 'formattime'], function (require) {
-          var FormatTime = require('formattime');
-          Playlist = require('playlist');
-          formatTime = new FormatTime();
-          return {
-            init: function() {
-              new CreatePlayer($el, formatTime, Playlist);
-            }
-          };
-        });
-      }
-      else {
-        $ = jQuery;
-        Playlist = window.Playlist;
-        formatTime = new window.FormatTime();
-        return new CreatePlayer($el, formatTime, Playlist);
-      }
-    };
+    debugger;
+    var formatTime;
+    var Playlist;
+    // TODO: Handle missing audio
+    if (typeof define === 'function' && define.amd) {
+      // Required Modules
+      define(['require', 'playlist', 'formattime'], function (require) {
+        var FormatTime = require('formattime');
+        Playlist = require('playlist');
+        formatTime = new FormatTime();
+        return {
+          init: function() {
+            new CreatePlayer($el, formatTime, Playlist);
+          }
+        };
+      });
+    }
+    else {
+      $ = jQuery;
+      Playlist = window.Playlist;
+      formatTime = new window.FormatTime();
+      return new CreatePlayer($el, formatTime, Playlist);
+    }
+  };
 
 }());

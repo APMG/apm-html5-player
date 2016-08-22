@@ -4,12 +4,15 @@ requirejs.config({
     jquery: 'bower_components/jquery/dist/jquery.min',
     formattime: '../../../script/FormatTime',
     playlist: '../../../script/Playlist',
-    player: '../../../script/Player'
+    player: '../../../script/Player',
+    test: '../../../script/test'
   }
 });
 
-requirejs(['jquery', 'player'], function($, Player){
+requirejs(['jquery', 'player','test'], function($, Player, T){
+  debugger;
+  T.init();
   if ($('.js-player').length) {
-    var player = Player.init($, $('.js-player'));
+    Player.init($, $('.js-player'));
   }
 });
