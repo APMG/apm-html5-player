@@ -190,7 +190,9 @@
     <script type="text/javascript" charset="utf-8" src='../../../script/Player.js'></script>
     <script type="text/javascript" charset="utf-8">
       $('.js-player').each(function() {
-        new Player($(this)).init();
+        var formatTime = new window.FormatTime();
+        var player = new Player($, $(this), formatTime, window.Playlist);
+        player.init();
       });
     </script>
   </body>

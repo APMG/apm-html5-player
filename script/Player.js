@@ -431,6 +431,6 @@
     });
   }
   else {
-    return Player;
+    window.Player = Player;
   }
 }());
