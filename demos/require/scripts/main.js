@@ -10,9 +10,8 @@ requirejs.config({
 });
 
 requirejs(['jquery', 'player','test'], function($, Player, T){
-  debugger;
-  T.init();
+  //T.init();
   if ($('.js-player').length) {
-    Player.init($, $('.js-player'));
+    Player.init();
   }
 });
