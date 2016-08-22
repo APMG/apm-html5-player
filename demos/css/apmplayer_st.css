@@ -1,0 +1,137 @@
+
+.page-embed #embed-container {
+	width: 320px;
+	margin: 10px;
+}
+
+#apm_media_player{
+	background: none;
+	border: none;
+}
+
+#apm_player_container, #apm_player_controls, #apm_media_wrapper {
+margin: 0;
+padding: 0;
+width: 100%;
+position: static;
+}
+
+#apm_player_container {
+padding-bottom: 0;
+}
+
+#apm_player_info {
+/*min-height: 200px;
+margin-bottom: 33px;*/
+display: none;
+}
+
+.page-embed #apm_player_info {
+min-height: 50px;
+display: block !important;
+}
+
+.ui-widget-header {
+  height: 10px;
+}
+
+#apm_sharing_tools {
+	margin-top: -35px;
+	margin-left: 48.8466757%;
+	width: 46%;
+}
+.node-type-story #apm_sharing_tools {
+    display: none;
+}
+
+.node-type-story #apm_player_volume_wrapper, .node-type-story #apm_player_playtime {
+    float: right;
+}
+.node-type-story #apm_player_playtime {
+    text-align: left;
+    width: 20%;
+    margin-right: -5px;
+}
+
+.node-type-story .volume.playtime #apm_player_bar_wrapper, .node-type-story .volume.playtime #apm_player_bar_container {
+    width: 75%;
+}
+.node-type-story #apm_player_bar.ui-slider-horizontal {
+    background-image: none;
+    background-color: #666;
+}
+#apm_sharing_tab_controls {
+	width: 95%;
+}
+
+#apm_sharing_tab_controls {
+    background: url('http://common.publicradio.org/media_player/1.4.0/skin/sprite.png') repeat-x;
+}
+
+.apm_sharing_tab {
+
+	display: none;
+}
+
+#apm_sharing_facebook, #apm_sharing_twitter {float: left; margin: 0; padding: 0;}
+#apm_sharing_twitter {margin:12px 0 -20px 25%;}
+
+#apm_sharing_tools .apm_sharing_tab{
+	font-size: 12px;
+	margin-left: 5px;
+	padding: 10px 0;
+	width: 100%;
+}
+
+.page-embed #apm_sharing_tools {
+	display: none;
+}
+
+.embed-move {
+	padding: 0 5px;
+}
+
+/* ==|== media queries ======================================================
+   ========================================================================== */
+
+@media only screen and (max-width: 720px) {
+
+    #apm_player_status, #apm_player_container, #apm_player_info {
+    	margin: 0;
+    	padding: 0;
+    }
+    #apm_player_info{
+        margin: 0 0 20px 0;
+    }
+
+}
+
+@media only screen and (max-width: 720px), only screen and (device-width: 768px) {
+
+/*** These styles handle the widths necessary to accomodate various widths of the play bar ***/
+
+/*    #apm_player_volume_wrapper {
+        display: none !important; visibility: hidden;
+    }
+
+    .playtime.volume #apm_player_bar_wrapper {
+        width: 245px;
+    }
+
+    .playtime.volume #apm_player_bar_container {
+        width: 176px;
+        float: left;
+    }
+
+    .no-playtime #apm_player_bar_wrapper {
+        width: 245px;
+    }
+
+    .no-playtime #apm_player_bar_container {
+        width: 245px;
+        float: left;
+    }*/
+
+/*** END conditional classes ***/
+
+}
