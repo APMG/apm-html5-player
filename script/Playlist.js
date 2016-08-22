@@ -3,21 +3,14 @@
   'use strict';
 
 
-  // Set up reference to parent module.
-  var player;
-  if (typeof define === 'function' && define.amd) {
-    // Required Modules
-    define(function (require) {
-      $ = require('jquery');
-    });
-  }
-  // Constructor
+    // Constructor
   // The 'parent' argument passed in is the parent object from Player.js.
   // This script is only intended to be used with that Player.js.
   var Playlist = function(parent) {
-    player = parent;
+    var $;
+    this.player = parent;
     // The containing DOM element
-    this.$el = player.$playlistElement;
+    this.$el = this.player.$playlistElement;
   };
 
   // -----------------------------
@@ -68,8 +61,8 @@
     var title = $target.data('title');
     var artist = $target.data('artist');
 
-    player.loadAudioFromSrc(src);
-    player.playAudio();
+    this.player.loadAudioFromSrc(src);
+    this.player.playAudio();
     this.displayPlayedState($target);
     this.displayBufferingState($target);
     this.populatePlayerInfo(title, artist);
@@ -113,8 +106,8 @@
   };
 
   Playlist.prototype.populatePlayerInfo = function(title, artist) {
-    player.$title.text(title);
-    player.$artist.text(artist);
+    this.player.$title.text(title);
+    this.player.$artist.text(artist);
   };
 
   // Support Require.js
