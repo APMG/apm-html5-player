@@ -8,10 +8,12 @@ requirejs.config({
     test: '../../../script/test'
   }
 });
-
-requirejs(['jquery', 'player','test'], function($, Player, T){
-  //T.init();
-  if ($('.js-player').length) {
-    Player.init();
+requirejs(['jquery', 'player','formattime', 'playlist'],
+  function($, Player, FormatTime, Playlist){
+    var formatTime = new FormatTime();
+    if ($('.js-player').length) {
+      var player = new Player($, $('.js-player'), formatTime, Playlist);
+      player.init();
+    }
   }
-});
+);
