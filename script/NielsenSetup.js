@@ -1,25 +1,17 @@
-require(['nielsen'], function(Nielsen) {
+define(['nielsen'], function() {
   'use strict';
+
   var NielsenSetup = function() {
-    window.nielsenMetadataObject = {
-      'dataSrc': 'cms',
-      'stationType': 1,
-      'type': 'radio',
-      'assetid': 'KCMP-FM',
-      'provider': 'MinnesotaPublicRadio'
-    };
+  };
 
-    window._nolggGlobalParams = {
-      sfcode: 'cert',
-      apid: 'T9EC85694-71F6-4667-B797-D8F2A939365F',
-      apn: 'test-setup'
-    };
-
-    window.nSdkInstance = window.NOLCMB.getInstance(window._nolggGlobalParams);
-    window.nSdkInstance.ggInitialize(window._nolggGlobalParams);
+  NielsenSetup.prototype.init = function(params, metadata) {
+    if(typeof(window.NOLCMB === 'undefined')) {
+      return;
+    }
+    window.nielsenMetadataObject = metadata;
+    window.nSdkInstance = window.NOLCMB.getInstance(params);
+    window.nSdkInstance.ggInitialize(params);
   };
 
   return new NielsenSetup();
-}, function(err) {
-  // Do nothing, some people use ad blockers.
 });

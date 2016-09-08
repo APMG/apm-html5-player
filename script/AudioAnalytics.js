@@ -107,7 +107,9 @@
      * @example trackEvent({ category: 'On-Demand Audio' action: 'FINISHED', label: meta.identifier });
      */
     function trackEvent(event) {
-
+      if(typeof window.ga === 'undefined') {
+        return;   // bail if no google analytics or ad blocker
+      }
       // Test that an object was passed
       if (typeof event !== 'object') {
         console.error('object expected');
