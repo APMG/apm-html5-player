@@ -256,11 +256,17 @@
 
   Player.prototype.playNext = function() {
     var nextSrc = this.getNextPlaylistSrc();
+    var $nextItem;
 
     if (typeof(nextSrc) === 'undefined') return;
-
+    $nextItem = this.findNext(nextSrc);
+    this.playlist.populatePlayerInfo($nextItem.data('title'), $nextItem.data('artist'));
     this.loadAudioFromSrc(nextSrc);
     this.playAudio();
+  };
+
+  Player.prototype.findNext = function(src) {
+    return $("li[data-src='" + src +"']");
   };
 
   Player.prototype.getSecondsByClickPosition = function($element, clickXPosition) {
@@ -296,8 +302,7 @@
 
   Player.prototype.getNextPlaylistSrc = function() {
     var $item = this.playlist.$items.filter($('[data-src="' + this.audio.src + '"]'));
-    var next = $item.data('next');
-    return next;
+    return $item.data('next');
   };
 
   Player.prototype.changeVolume = function(volume) {

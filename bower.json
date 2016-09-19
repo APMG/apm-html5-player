@@ -1,0 +1,19 @@
+{
+  "name": "APM HTML 5 Javascript Player",
+  "authors": [
+    "Hankerson",
+    "Geoffrey <ghankerson@mpr.org>"
+  ],
+  "description": "",
+  "main": "",
+  "license": "MIT",
+  "homepage": "",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
