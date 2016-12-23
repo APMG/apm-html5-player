@@ -93,13 +93,14 @@
     function onPlayPause() {
       var category = getCategory(), src = audioSrcForReporting();
 
+      checkSources();
+
       // Track only the first 'PLAY' event as 'START' (we don't care about 'PAUSE' status)
       if ( self.isFirstPlay === true ) {
         //console.log('About to call with: ' );
         //console.log({ category: category, action: 'START', label: src});
         trackEvent({ category: category, action: 'START', label: src});
       }
-      checkSources();
     }
 
     /* Handle Google Universal or Classic API calls
