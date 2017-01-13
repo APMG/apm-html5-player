@@ -57,6 +57,8 @@
     this.audio = this.$el.find('audio')[0];
     // Controls
     this.$playButton = this.$el.find('.js-player-play');
+    this.$skipForwardButton = this.$el.find('[data-skip-forward]');
+    this.$skipBackButton = this.$el.find('[data-skip-back]');
     this.$visualPlayButton = this.$playButton.find('#apm_player_play');
     this.$visualPauseButton = this.$playButton.find('#apm_player_pause');
     this.$timeline = this.$el.find('.js-player-timeline');
@@ -79,6 +81,8 @@
   Player.prototype.bindEventHandlers = function() {
     // Jquery events
     this.$playButton.on('click', this.onPlayClick.bind(this));
+    this.$skipForwardButton.on('click', this.onSkipForwardClick.bind(this));
+    this.$skipBackButton.on('click', this.onSkipBackClick.bind(this));
     this.$timeline.on('click', this.onTimelineClick.bind(this));
     this.$volumeBar.on('click', this.onVolumeClick.bind(this));
     this.$muteButton.on('click', this.onMuteClick.bind(this));
@@ -129,6 +133,32 @@
         this.unloadAudio();
       }
     }
+  };
+
+  Player.prototype.onSkipForwardClick = function(e) {
+    var $target = $(e.currentTarget);
+    var seconds = $target.data('skip-forward');
+
+    e.preventDefault();
+
+    if (this.audio.duration === Infinity) {
+      return;
+    }
+
+    this.skipForward(seconds);
+  };
+
+  Player.prototype.onSkipBackClick = function(e) {
+    var $target = $(e.currentTarget);
+    var seconds = $target.data('skip-back');
+
+    e.preventDefault();
+
+    if (this.audio.duration === Infinity) {
+      return;
+    }
+
+    this.skipBack(seconds);
   };
 
   Player.prototype.onTimelineClick = function(e) {
@@ -282,6 +312,14 @@
 
   Player.prototype.seekTime = function(seconds) {
     this.audio.currentTime = seconds;
+  };
+
+  Player.prototype.skipForward = function(seconds) {
+    this.audio.currentTime = this.audio.currentTime + seconds;
+  };
+
+  Player.prototype.skipBack = function(seconds) {
+    this.audio.currentTime = this.audio.currentTime - seconds;
   };
 
   Player.prototype.getVolumeByClickPosition = function($element, clickYPosition) {
