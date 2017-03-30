@@ -365,8 +365,12 @@
 
   // Displays the length of the audio file
   Player.prototype.displayDuration = function() {
-    var duration = this.formatTime.toFormatted(this.audio.duration);
-    this.$duration.html(duration);
+    var duration;
+
+    if (this.audio.duration !== Infinity) {
+      duration = this.formatTime.toFormatted(this.audio.duration);
+      this.$duration.html(duration);
+    }
   };
 
   // Changes the current time numbers while playing
