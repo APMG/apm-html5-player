@@ -7,8 +7,14 @@
   var LOADING_CLASS = 'is-loading';
   var MUTED_CLASS = 'is-muted';
 
+  // Allows jquery to be passed in through the constructor and scoped properly for normal usage
+  var $;
+
   // Constructor
-  var Player = function($, $el, formatTime, Playlist) {
+  var Player = function(jqueryLocal, $el, formatTime, Playlist) {
+    // Set $ to passed-in jquery
+    $ = jqueryLocal;
+
     // The containing DOM element
     this.$el = $el;
 
@@ -173,8 +179,15 @@
 
   Player.prototype.onVolumeClick = function(e) {
     var $target = $(e.currentTarget);
-    var clickYPosition = e.pageY;
-    var volume = this.getVolumeByClickPosition($target, clickYPosition);
+    var volume;
+
+    if ($target.data('volume-direction') === 'h') {
+      var clickXPosition = e.pageX;
+      volume = this.getVolumeByHorizClickPosition($target, clickXPosition);
+    } else {
+      var clickYPosition = e.pageY;
+      volume = this.getVolumeByVertClickPosition($target, clickYPosition);
+    }
 
     e.preventDefault();
 
@@ -322,7 +335,17 @@
     this.audio.currentTime = this.audio.currentTime - seconds;
   };
 
-  Player.prototype.getVolumeByClickPosition = function($element, clickYPosition) {
+  Player.prototype.getVolumeByHorizClickPosition = function($element, clickXPosition) {
+    var volumeBarOffset = $element.offset().left;
+    var volumeBarWidth = $element.outerWidth();
+    var positionInElement = clickXPosition - volumeBarOffset;
+    var percent = positionInElement / volumeBarWidth;
+    var volume = Number(percent.toFixed(2));
+
+    return volume;
+  };
+
+  Player.prototype.getVolumeByVertClickPosition = function($element, clickYPosition) {
     var volumeBarOffset = $element.offset().top;
     var volumeBarHeight = $element.outerHeight();
     var positionInElement = clickYPosition - volumeBarOffset;
@@ -459,7 +482,11 @@
       this.displayUnmutedState();
     }
 
-    this.$currentVolume.css('height', volumePercent + '%');
+    if (this.$volumeBar.data('volume-direction') === 'h') {
+      this.$currentVolume.css('width', volumePercent + '%');
+    } else {
+      this.$currentVolume.css('height', volumePercent + '%');
+    }
 
     return this;
   };
