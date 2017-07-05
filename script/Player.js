@@ -241,7 +241,9 @@
   // finished for the current file
   Player.prototype.onAudioEnded = function() {
     this.displayStoppedState();
-    this.playNext();
+    if (this.hasPlaylist === true) {
+      this.playNext();
+    }
   };
 
   // HTMLMediaElement 'volumechange' event fires when the audio's
