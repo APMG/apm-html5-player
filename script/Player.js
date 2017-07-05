@@ -102,6 +102,7 @@
     this.audio.addEventListener('ended', this.onAudioEnded.bind(this));
     this.audio.addEventListener('volumechange', this.onVolumeChange.bind(this));
     this.audio.addEventListener('loadedmetadata', this.onLoadedMetadata.bind(this));
+    this.audio.addEventListener('progress', this.onProgress.bind(this));
 
     return this;
   };
@@ -252,9 +253,17 @@
     this.displayCurrentVolume();
   };
 
+  // HTMLMediaElement 'onLoadedMetadata' event fires when the audio's
+  // metadata has been downloaded
   Player.prototype.onLoadedMetadata = function() {
     this.displayDuration();
     this.sendToNielsen('loadMetadata', window.nielsenMetadataObject);
+  };
+
+  // HTMLMediaElement 'progress' event fires when any data
+  // gets downloaded
+  Player.prototype.onProgress = function() {
+    this.displayTimeRanges();
   };
 
   // -----------------------------
@@ -415,6 +424,36 @@
   Player.prototype.updateTimelineProgress = function() {
     var progress = (this.audio.currentTime / this.audio.duration) * 100;
     this.$timelineProgress.css('width', progress + '%');
+  };
+
+  // Show the portions of the file that have been downloaded
+  // (i.e. 'buffered') on the timeline
+  Player.prototype.displayTimeRanges = function() {
+    if (this.isPlaying !== true) { return; }
+    if (this.audio.duration === Infinity) { return; }
+
+    for (var i = 0; i < this.audio.buffered.length; i++) {
+      var currentBuffer = this.audio.buffered.length - 1 - i;
+
+      if (this.audio.buffered.start(currentBuffer) < this.audio.currentTime) {
+        var startX = this.audio.buffered.start(currentBuffer);
+        var endX = this.audio.buffered.end(currentBuffer);
+        var posXPercent = (startX / this.audio.duration) * 100;
+        var widthPercent = (((endX - startX) / this.audio.duration) * 100);
+        var $timeRanges = this.$timelineBuffered.children();
+        var timeRangeCss = {
+          'left': posXPercent + '%',
+          'width': widthPercent + '%'
+        };
+
+        if ($timeRanges.eq(currentBuffer).length) {
+          $timeRanges.eq(currentBuffer).css(timeRangeCss);
+        } else {
+          this.$timelineBuffered.append('<div></div>');
+          $timeRanges.eq(currentBuffer).css(timeRangeCss);
+        }
+      }
+    }
   };
 
   // Modifies the play/pause button state
