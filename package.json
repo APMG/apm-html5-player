@@ -14,5 +14,8 @@
   "repository": {
     "type": "git",
     "url": "git@gitlab.mpr.org:js-libraries/apm-html5-player.git"
+  },
+  "dependencies": {
+    "jquery": "3.1.1"
   }
 }
