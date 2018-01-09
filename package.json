@@ -2,7 +2,7 @@
   "name": "apm-html5-player",
   "title": "APM HTML5 Player",
   "description": "Javascript library for APM html5 audio players",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "license": "MIT",
   "private": true,
   "main": "script/Player.js",
@@ -16,6 +16,6 @@
     "url": "git@gitlab.mpr.org:js-libraries/apm-html5-player.git"
   },
   "dependencies": {
-    "jquery": "3.1.1"
+    "jquery": "^3.1.1"
   }
 }

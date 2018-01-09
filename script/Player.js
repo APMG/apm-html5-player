@@ -368,12 +368,12 @@
   };
 
   Player.prototype.getPlaylistItem = function() {
-    var $item = this.playlist.$items.filter($('[data-src="' + this.audio.src + '"]'));
+    var $item = this.playlist.$items.filter($('[data-src="' + $(this.audio).attr('src') + '"]'));
     return $item;
   };
 
   Player.prototype.getNextPlaylistSrc = function() {
-    var $item = this.playlist.$items.filter($('[data-src="' + this.audio.src + '"]'));
+    var $item = this.playlist.$items.filter($('[data-src="' + $(this.audio).attr('src') + '"]'));
     return $item.data('next');
   };
 
