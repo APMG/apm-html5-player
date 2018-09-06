@@ -325,7 +325,7 @@
 
   Player.prototype.getSecondsByClickPosition = function($element, clickXPosition) {
     var timelineOffset = $element.offset().left;
-    var timelineWidth = $element.outerWidth();
+    var timelineWidth = $element.width();
     var positionInElement = clickXPosition - timelineOffset;
     var percent = positionInElement / timelineWidth;
     var time = this.audio.duration * percent;
@@ -348,7 +348,7 @@
 
   Player.prototype.getVolumeByHorizClickPosition = function($element, clickXPosition) {
     var volumeBarOffset = $element.offset().left;
-    var volumeBarWidth = $element.outerWidth();
+    var volumeBarWidth = $element.width();
     var positionInElement = clickXPosition - volumeBarOffset;
     var percent = positionInElement / volumeBarWidth;
     var volume = Number(percent.toFixed(2));
