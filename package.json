@@ -7,17 +7,21 @@
     "description": "Javascript library for APM html5 audio players",
     "homepage": "https://github.com/APMG/apm-html5-player",
     "license": "MIT",
-    "main": "src/index.js",
+    "main": "src/Player.js",
     "name": "apm-html5-player",
-    "private": true,
+    "private": false,
     "repository": {
         "type": "git",
         "url": "git@gitlab.mpr.org:js-libraries/apm-html5-player.git"
     },
     "scripts": {
-        "build": "rm -rf dist/ && cp -R src/ dist/"
+        "build": "rm -rf dist/ && babel src -d dist"
     },
     "title": "APM HTML5 Player",
-    "version": "0.4.0",
-    "devDependencies": {}
+    "version": "0.4.1",
+    "devDependencies": {
+        "@babel/cli": "^7.2.3",
+        "@babel/core": "^7.3.4",
+        "@babel/preset-env": "^7.3.4"
+    }
 }
