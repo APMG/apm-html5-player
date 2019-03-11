@@ -15,12 +15,9 @@
         "url": "git@gitlab.mpr.org:js-libraries/apm-html5-player.git"
     },
     "scripts": {
-        "build": "rm -rf dist/ && NODE_ENV=production webpack --mode production"
+        "build": "rm -rf dist/ && cp -R src/ dist/"
     },
     "title": "APM HTML5 Player",
     "version": "0.3.2",
-    "devDependencies": {
-        "webpack": "^4.29.6",
-        "webpack-cli": "^3.2.3"
-    }
+    "devDependencies": {}
 }
