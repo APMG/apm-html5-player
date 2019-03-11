@@ -5,15 +5,23 @@
     ],
     "dependencies": {},
     "description": "Javascript library for APM html5 audio players",
-    "homepage": "https://gitlab.mpr.org/js-libraries/apm-html5-player",
+    "homepage": "https://github.com/APMG/apm-html5-player",
     "license": "MIT",
-    "main": "script/Player.js",
+    "main": "src/index.js",
     "name": "apm-html5-player",
     "private": true,
     "repository": {
         "type": "git",
         "url": "git@gitlab.mpr.org:js-libraries/apm-html5-player.git"
     },
+    "scripts": {
+        "build": "rm -rf dist/ && NODE_ENV=production webpack --mode production"
+    },
     "title": "APM HTML5 Player",
-    "version": "0.3.1"
+    "version": "0.3.2",
+    "devDependencies": {
+        "copy-webpack-plugin": "^5.0.1",
+        "webpack": "^4.29.6",
+        "webpack-cli": "^3.2.3"
+    }
 }
