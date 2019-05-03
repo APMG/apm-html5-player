@@ -1,5 +1,4 @@
-export const Player = require("./Player");
-export const Playlist = require("./Playlist");
-export const NielsenSetup = require("./NielsenSetup");
-export const AudioAnalytics = require("./AudioAnalytics");
-export const FormatTime = require("./FormatTime");
+export { default as Player } from './Player';
+export { default as Playlist } from './Playlist';
+export { default as NielsenSetup } from './NielsenSetup';
+export { default as AudioAnalytics } from './AudioAnalytics';
