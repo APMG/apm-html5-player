@@ -1,4 +1,5 @@
 .sass-cache
 bower_components
 node_modules
-dist
+# We are leaving dist in the repo for now so that it can work with bower
+# dist
