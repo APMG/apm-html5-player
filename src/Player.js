@@ -58,16 +58,14 @@ Player.prototype.selectElements = function() {
   this.skipForwardButtonEl = this.el.querySelector('[data-skip-forward]');
   this.skipBackButtonEl = this.el.querySelector('[data-skip-back]');
   this.timelineEl = this.el.querySelector('.js-player-timeline');
-  this.timelineProgressEl = this.timelineEl.querySelector(
-    '.js-player-progress'
-  );
-  this.timelineBufferedEl = this.timelineEl.querySelector(
-    '.js-player-buffered'
-  );
+  this.timelineProgressEl =
+    this.timelineEl && this.timelineEl.querySelector('.js-player-progress');
+  this.timelineBufferedEl =
+    this.timelineEl && this.timelineEl.querySelector('.js-player-buffered');
   this.volumeBarEl = this.el.querySelector('.js-player-volume');
-  this.currentVolumeEl = this.volumeBarEl.querySelector(
-    '.js-player-volume-current'
-  );
+  this.currentVolumeEl =
+    this.volumeBarEl &&
+    this.volumeBarEl.querySelector('.js-player-volume-current');
   this.muteButtonEl = this.el.querySelector('.js-player-mute');
   // Info
   this.timeEl = this.el.querySelector('.js-player-time');
@@ -470,12 +468,9 @@ Player.prototype.updateTimelineProgress = function() {
 // Show the portions of the file that have been downloaded
 // (i.e. 'buffered') on the timeline
 Player.prototype.displayTimeRanges = function() {
-  if (this.isPlaying !== true) {
-    return;
-  }
-  if (this.audioEl.duration === Infinity) {
-    return;
-  }
+  if (!this.timelineBufferedEl) return;
+  if (this.isPlaying !== true) return;
+  if (this.audioEl.duration === Infinity) return;
 
   for (var i = 0; i < this.audioEl.buffered.length; i++) {
     var currentBuffer = i;
@@ -564,6 +559,8 @@ Player.prototype.removeBufferingState = function() {
 };
 
 Player.prototype.displayCurrentVolume = function() {
+  if (!this.volumeBarEl) return;
+
   var volumePercent = this.audioEl.volume * 100;
 
   if (this.audioEl.volume === 0) {
