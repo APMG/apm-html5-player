@@ -5,6 +5,9 @@
   ],
   "dependencies": {},
   "description": "Javascript library for APM html5 audio players",
+  "files": [
+    "dist/**/*"
+  ],
   "homepage": "https://github.com/APMG/apm-html5-player",
   "license": "MIT",
   "main": "dist/bundle.js",
@@ -16,13 +19,16 @@
   },
   "scripts": {
     "build": "rollup -c",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "test": "jest",
+    "test:watch": "jest --watch"
   },
   "title": "APM HTML5 Player",
-  "version": "1.0.0",
+  "version": "1.0.0-alpha.0",
   "devDependencies": {
     "@babel/cli": "^7.4.4",
     "@babel/core": "^7.4.4",
+    "@babel/preset-env": "^7.4.4",
     "babel-jest": "^24.7.1",
     "eslint": "^5.16.0",
     "eslint-config-prettier": "^4.2.0",

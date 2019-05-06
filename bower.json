@@ -1,6 +1,6 @@
 {
   "name": "apm-html5-player",
-  "version": "1.0.0",
+  "version": "1.0.0-alpha.0",
   "authors": [
     "Matt Aho <maho@mpr.org>",
     "Geoffrey Hankerson <ghankerson@mpr.org>"
@@ -9,11 +9,11 @@
   "main": "script/Player.js",
   "moduleType": ["amd", "globals"],
   "license": "MIT",
-  "homepage": "https://gitlab.mpr.org/js-libraries/apm-html5-player",
+  "homepage": "https://github.com/APMG/apm-html5-player.git",
   "private": true,
   "repository": {
     "type": "git",
-    "url": "git@gitlab.mpr.org:js-libraries/apm-html5-player.git"
+    "url": "https://github.com/APMG/apm-html5-player.git"
   },
   "ignore": [
     "**/.*",

@@ -468,8 +468,11 @@ Player.prototype.updateTimelineProgress = function() {
 // Show the portions of the file that have been downloaded
 // (i.e. 'buffered') on the timeline
 Player.prototype.displayTimeRanges = function() {
+  // Exit if there is no timeline element
   if (!this.timelineBufferedEl) return;
+  // Exit if audio isn't playing
   if (this.isPlaying !== true) return;
+  // Exit if live audio is playing
   if (this.audioEl.duration === Infinity) return;
 
   for (var i = 0; i < this.audioEl.buffered.length; i++) {
