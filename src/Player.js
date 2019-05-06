@@ -1,38 +1,32 @@
+import { toFormatted } from './FormatTime';
+// import Playlist from './Playlist';
+
 // Constants
 var PLAYING_CLASS = 'is-playing';
 var PAUSED_CLASS = 'is-paused';
 var LOADING_CLASS = 'is-loading';
 var MUTED_CLASS = 'is-muted';
 
-// Allows jquery to be passed in through the constructor and scoped properly for normal usage
-var $;
-
 // Constructor
-var Player = function(jqueryLocal, $el, formatTime, Playlist) {
-  // Set $ to passed-in jquery
-  $ = jqueryLocal;
-
+var Player = function(el, options) {
   // The containing DOM element
-  this.$el = $el;
+  this.el = el;
 
-  // formatTime helper class
-  this.formatTime = formatTime;
-
-  //Playlist class
-  this.Playlist = Playlist;
+  // An object with player options
+  this.options = options;
 
   // The playing/paused state of the Player
   this.isPlaying = false;
 
   // The src that will be used for audio
-  this.src = this.$el.data('src');
+  this.src = this.el.getAttribute('data-src');
 
   // A variable to store the previous volume the player was set at.
   this.storedVolume = 1;
 
   // References to the playlist
-  this.playlistSelector = this.$el.data('playlist');
-  this.$playlistElement = $(this.playlistSelector);
+  this.playlistSelector = this.el.getAttribute('data-playlist');
+  this.playlistEl = document.querySelector(this.playlistSelector);
   // The playlist module, initialized later
   this.playlist;
   // Set to true when playlist is initialized
@@ -46,7 +40,8 @@ var Player = function(jqueryLocal, $el, formatTime, Playlist) {
 // Initialize the module
 Player.prototype.init = function() {
   this.selectElements()
-    .initPlaylist()
+    // TODO split out playlist
+    // .initPlaylist()
     .bindEventHandlers()
     .initTime()
     .displayCurrentVolume();
@@ -56,52 +51,77 @@ Player.prototype.init = function() {
 
 // Descendant elements of the containing DOM element
 Player.prototype.selectElements = function() {
-  this.audio = this.$el.find('audio')[0];
+  // The audio element used for playback
+  this.audioEl = this.el.querySelector('audio');
   // Controls
-  this.$playButton = this.$el.find('.js-player-play');
-  this.$skipForwardButton = this.$el.find('[data-skip-forward]');
-  this.$skipBackButton = this.$el.find('[data-skip-back]');
-  this.$visualPlayButton = this.$playButton.find('#apm_player_play');
-  this.$visualPauseButton = this.$playButton.find('#apm_player_pause');
-  this.$timeline = this.$el.find('.js-player-timeline');
-  this.$timelineProgress = this.$timeline.find('.js-player-progress');
-  this.$timelineBuffered = this.$timeline.find('.js-player-buffered');
-  this.$volumeBar = this.$el.find('.js-player-volume');
-  this.$currentVolume = this.$volumeBar.find('.js-player-volume-current');
-  this.$muteButton = this.$el.find('.js-player-mute');
+  this.playButtonEl = this.el.querySelector('.js-player-play');
+  this.skipForwardButtonEl = this.el.querySelector('[data-skip-forward]');
+  this.skipBackButtonEl = this.el.querySelector('[data-skip-back]');
+  this.timelineEl = this.el.querySelector('.js-player-timeline');
+  this.timelineProgressEl = this.timelineEl.querySelector(
+    '.js-player-progress'
+  );
+  this.timelineBufferedEl = this.timelineEl.querySelector(
+    '.js-player-buffered'
+  );
+  this.volumeBarEl = this.el.querySelector('.js-player-volume');
+  this.currentVolumeEl = this.volumeBarEl.querySelector(
+    '.js-player-volume-current'
+  );
+  this.muteButtonEl = this.el.querySelector('.js-player-mute');
   // Info
-  this.$time = this.$el.find('.js-player-time');
-  this.$duration = this.$el.find('.js-player-duration');
-  this.$currentTime = this.$el.find('.js-player-currentTime');
-  this.$title = this.$el.find('.js-player-title');
-  this.$artist = this.$el.find('.js-player-artist');
+  this.timeEl = this.el.querySelector('.js-player-time');
+  this.durationEl = this.el.querySelector('.js-player-duration');
+  this.currentTimeEl = this.el.querySelector('.js-player-currentTime');
+  this.titleEl = this.el.querySelector('.js-player-title');
+  this.artistEl = this.el.querySelector('.js-player-artist');
 
   return this;
 };
 
 // Setup and bind event handlers
 Player.prototype.bindEventHandlers = function() {
-  // Jquery events
-  this.$playButton.on('click', this.onPlayClick.bind(this));
-  this.$skipForwardButton.on('click', this.onSkipForwardClick.bind(this));
-  this.$skipBackButton.on('click', this.onSkipBackClick.bind(this));
-  this.$timeline.on('click', this.onTimelineClick.bind(this));
-  this.$volumeBar.on('click', this.onVolumeClick.bind(this));
-  this.$muteButton.on('click', this.onMuteClick.bind(this));
+  // Click events
+  this.playButtonEl &&
+    this.playButtonEl.addEventListener('click', this.onPlayClick.bind(this));
 
-  // Native javascript events
-  this.audio.addEventListener('play', this.onAudioPlay.bind(this));
-  this.audio.addEventListener('pause', this.onAudioPause.bind(this));
-  this.audio.addEventListener('timeupdate', this.onAudioTimeupdate.bind(this));
-  this.audio.addEventListener('waiting', this.onAudioWaiting.bind(this));
-  this.audio.addEventListener('playing', this.onAudioPlaying.bind(this));
-  this.audio.addEventListener('ended', this.onAudioEnded.bind(this));
-  this.audio.addEventListener('volumechange', this.onVolumeChange.bind(this));
-  this.audio.addEventListener(
+  this.skipForwardButtonEl &&
+    this.skipForwardButtonEl.addEventListener(
+      'click',
+      this.onSkipForwardClick.bind(this)
+    );
+
+  this.skipBackButtonEl &&
+    this.skipBackButtonEl.addEventListener(
+      'click',
+      this.onSkipBackClick.bind(this)
+    );
+
+  this.timelineEl &&
+    this.timelineEl.addEventListener('click', this.onTimelineClick.bind(this));
+
+  this.volumeBarEl &&
+    this.volumeBarEl.addEventListener('click', this.onVolumeClick.bind(this));
+
+  this.muteButtonEl &&
+    this.muteButtonEl.addEventListener('click', this.onMuteClick.bind(this));
+
+  // Audio element events
+  this.audioEl.addEventListener('play', this.onAudioPlay.bind(this));
+  this.audioEl.addEventListener('pause', this.onAudioPause.bind(this));
+  this.audioEl.addEventListener(
+    'timeupdate',
+    this.onAudioTimeupdate.bind(this)
+  );
+  this.audioEl.addEventListener('waiting', this.onAudioWaiting.bind(this));
+  this.audioEl.addEventListener('playing', this.onAudioPlaying.bind(this));
+  this.audioEl.addEventListener('ended', this.onAudioEnded.bind(this));
+  this.audioEl.addEventListener('volumechange', this.onVolumeChange.bind(this));
+  this.audioEl.addEventListener(
     'loadedmetadata',
     this.onLoadedMetadata.bind(this)
   );
-  this.audio.addEventListener('progress', this.onProgress.bind(this));
+  this.audioEl.addEventListener('progress', this.onProgress.bind(this));
 
   return this;
 };
@@ -111,15 +131,16 @@ Player.prototype.initTime = function() {
   return this;
 };
 
-Player.prototype.initPlaylist = function() {
-  if (this.$playlistElement.length) {
-    this.playlist = new this.Playlist(this);
-    this.playlist.init();
-    this.hasPlaylist = true;
-  }
+// TODO: split out playlist
+// Player.prototype.initPlaylist = function() {
+//   if (this.playlistEl.length) {
+//     this.playlist = new Playlist(this);
+//     this.playlist.init();
+//     this.hasPlaylist = true;
+//   }
 
-  return this;
-};
+//   return this;
+// };
 
 // -----------------------------
 // Event Handlers
@@ -129,25 +150,25 @@ Player.prototype.onPlayClick = function(e) {
   e.preventDefault();
 
   if (this.isPlaying === false) {
-    if (this.audio.readyState === 0) {
+    if (this.audioEl.readyState === 0) {
       this.loadAudioFromSrc(this.src);
     }
     this.playAudio();
   } else {
     this.pauseAudio();
-    if (this.audio.duration === Infinity) {
+    if (this.audioEl.duration === Infinity) {
       this.unloadAudio();
     }
   }
 };
 
 Player.prototype.onSkipForwardClick = function(e) {
-  var $target = $(e.currentTarget);
-  var seconds = $target.data('skip-forward');
+  var targetEl = e.currentTarget;
+  var seconds = targetEl.getAttribute('data-skip-forward');
 
   e.preventDefault();
 
-  if (this.audio.duration === Infinity) {
+  if (this.audioEl.duration === Infinity) {
     return;
   }
 
@@ -155,12 +176,12 @@ Player.prototype.onSkipForwardClick = function(e) {
 };
 
 Player.prototype.onSkipBackClick = function(e) {
-  var $target = $(e.currentTarget);
-  var seconds = $target.data('skip-back');
+  var targetEl = e.currentTarget;
+  var seconds = targetEl.getAttribute('data-skip-back');
 
   e.preventDefault();
 
-  if (this.audio.duration === Infinity) {
+  if (this.audioEl.duration === Infinity) {
     return;
   }
 
@@ -168,9 +189,9 @@ Player.prototype.onSkipBackClick = function(e) {
 };
 
 Player.prototype.onTimelineClick = function(e) {
-  var $target = $(e.currentTarget);
+  var targetEl = e.currentTarget;
   var clickXPosition = e.pageX;
-  var seconds = this.getSecondsByClickPosition($target, clickXPosition);
+  var seconds = this.getSecondsByClickPosition(targetEl, clickXPosition);
 
   e.preventDefault(e);
 
@@ -178,15 +199,15 @@ Player.prototype.onTimelineClick = function(e) {
 };
 
 Player.prototype.onVolumeClick = function(e) {
-  var $target = $(e.currentTarget);
+  var targetEl = e.currentTarget;
   var volume;
 
-  if ($target.data('volume-direction') === 'h') {
+  if (targetEl.getAttribute('data-volume-direction') === 'h') {
     var clickXPosition = e.pageX;
-    volume = this.getVolumeByHorizClickPosition($target, clickXPosition);
+    volume = this.getVolumeByHorizClickPosition(targetEl, clickXPosition);
   } else {
     var clickYPosition = e.pageY;
-    volume = this.getVolumeByVertClickPosition($target, clickYPosition);
+    volume = this.getVolumeByVertClickPosition(targetEl, clickYPosition);
   }
 
   e.preventDefault();
@@ -197,7 +218,7 @@ Player.prototype.onVolumeClick = function(e) {
 Player.prototype.onMuteClick = function(e) {
   e.preventDefault();
 
-  if (this.audio.volume !== 0) {
+  if (this.audioEl.volume !== 0) {
     this.muteAudio();
   } else {
     this.unmuteAudio();
@@ -241,9 +262,10 @@ Player.prototype.onAudioPlaying = function() {
 // finished for the current file
 Player.prototype.onAudioEnded = function() {
   this.displayStoppedState();
-  if (this.hasPlaylist === true) {
-    this.playNext();
-  }
+  // TODO: split out playlist
+  // if (this.hasPlaylist === true) {
+  //   this.playNext();
+  // }
 };
 
 // HTMLMediaElement 'volumechange' event fires when the audio's
@@ -266,97 +288,98 @@ Player.prototype.onProgress = function() {
 };
 
 // -----------------------------
-// Helpers
+// Audio Element Methods
 // -----------------------------
 
 Player.prototype.loadAudioFromSrc = function(src) {
-  this.audio.src = src;
+  this.audioEl.src = src;
 };
 
 Player.prototype.sendToNielsen = function(key, value) {
-  if (window.nSdkInstance && this.audio.duration === Infinity) {
+  if (window.nSdkInstance && this.audioEl.duration === Infinity) {
     window.nSdkInstance.ggPM(key, value);
   }
 };
 
 Player.prototype.unloadAudio = function() {
   this.isPlaying = false;
-  this.audio.src = '';
+  this.audioEl.src = '';
   this.displayStoppedState();
   this.sendToNielsen('stop', Date.now() / 1000);
 };
 
 Player.prototype.playAudio = function() {
   this.pauseAllAudio();
-  this.audio.play();
+  this.audioEl.play();
 };
 
 Player.prototype.pauseAudio = function(currentAudio) {
   if (typeof currentAudio !== 'undefined') {
     currentAudio.pause();
   } else {
-    this.audio.pause();
+    this.audioEl.pause();
   }
 };
 
 Player.prototype.pauseAllAudio = function() {
   // Pause any audio that may already be playing on the page.
   var self = this;
-  $('audio').each(function() {
-    self.pauseAudio(this);
+  var audioEls = document.querySelectorAll('audio');
+  Array.prototype.forEach.call(audioEls, function(el) {
+    self.pauseAudio(el);
   });
 };
 
-Player.prototype.playNext = function() {
-  var nextSrc = this.getNextPlaylistSrc();
-  var $nextItem;
+// TODO: Split out playlist
+// Player.prototype.playNext = function() {
+//   var nextSrc = this.getNextPlaylistSrc();
+//   var nextItemEl;
 
-  if (typeof nextSrc === 'undefined') return;
-  $nextItem = this.findNext(nextSrc);
-  this.playlist.populatePlayerInfo(
-    $nextItem.data('title'),
-    $nextItem.data('artist')
-  );
-  this.loadAudioFromSrc(nextSrc);
-  this.playAudio();
-};
+//   if (typeof nextSrc === 'undefined') return;
+//   nextItemEl = this.findNext(nextSrc);
+//   this.playlist.populatePlayerInfo(
+//     nextItemEl.getAttribute('data-title'),
+//     nextItemEl.getAttribute('data-artist')
+//   );
+//   this.loadAudioFromSrc(nextSrc);
+//   this.playAudio();
+// };
 
-Player.prototype.findNext = function(src) {
-  return $("li[data-src='" + src + "']");
-};
+// Player.prototype.findNext = function(src) {
+//   return this.playlistEl.querySelector("li[data-src='" + src + "']");
+// };
 
-Player.prototype.getSecondsByClickPosition = function(
-  $element,
-  clickXPosition
-) {
-  var timelineOffset = $element.offset().left;
-  var timelineWidth = $element.width();
+Player.prototype.getSecondsByClickPosition = function(element, clickXPosition) {
+  var timelineRect = element.getBoundingClientRect();
+  var timelineOffset = timelineRect.left;
+  var timelineWidth = element.offsetWidth;
   var positionInElement = clickXPosition - timelineOffset;
   var percent = positionInElement / timelineWidth;
-  var time = this.audio.duration * percent;
+  var time = this.audioEl.duration * percent;
   var seconds = Number(time.toFixed());
 
   return seconds;
 };
 
 Player.prototype.seekTime = function(seconds) {
-  this.audio.currentTime = seconds;
+  this.audioEl.currentTime = seconds;
 };
 
 Player.prototype.skipForward = function(seconds) {
-  this.audio.currentTime = this.audio.currentTime + seconds;
+  this.audioEl.currentTime = this.audioEl.currentTime + seconds;
 };
 
 Player.prototype.skipBack = function(seconds) {
-  this.audio.currentTime = this.audio.currentTime - seconds;
+  this.audioEl.currentTime = this.audioEl.currentTime - seconds;
 };
 
 Player.prototype.getVolumeByHorizClickPosition = function(
-  $element,
+  element,
   clickXPosition
 ) {
-  var volumeBarOffset = $element.offset().left;
-  var volumeBarWidth = $element.width();
+  var volumeBarRect = element.getBoundingClientRect();
+  var volumeBarOffset = volumeBarRect.left;
+  var volumeBarWidth = element.offsetWidth;
   var positionInElement = clickXPosition - volumeBarOffset;
   var percent = positionInElement / volumeBarWidth;
   var volume = Number(percent.toFixed(2));
@@ -365,11 +388,12 @@ Player.prototype.getVolumeByHorizClickPosition = function(
 };
 
 Player.prototype.getVolumeByVertClickPosition = function(
-  $element,
+  element,
   clickYPosition
 ) {
-  var volumeBarOffset = $element.offset().top;
-  var volumeBarHeight = $element.outerHeight();
+  var volumeBarRect = element.getBoundingClientRect();
+  var volumeBarOffset = volumeBarRect.top + document.scrollTop;
+  var volumeBarHeight = element.offsetHeight;
   var positionInElement = clickYPosition - volumeBarOffset;
   var positionFromBottom = volumeBarHeight - positionInElement;
   var percent = positionFromBottom / volumeBarHeight;
@@ -378,26 +402,28 @@ Player.prototype.getVolumeByVertClickPosition = function(
   return volume;
 };
 
-Player.prototype.getPlaylistItem = function() {
-  var $item = this.playlist.$items.filter(
-    $('[data-src="' + $(this.audio).attr('src') + '"]')
-  );
-  return $item;
-};
+// TODO: Should probably move all playlist stuff out of here
+//
+// Player.prototype.getPlaylistItem = function() {
+//   var $item = this.playlist.items.filter(
+//     $('[data-src="' + $(this.audio).attr('src') + '"]')
+//   );
+//   return $item;
+// };
 
-Player.prototype.getNextPlaylistSrc = function() {
-  var $item = this.playlist.$items.filter(
-    $('[data-src="' + $(this.audio).attr('src') + '"]')
-  );
-  return $item.data('next');
-};
+// Player.prototype.getNextPlaylistSrc = function() {
+//   var $item = this.playlist.$items.filter(
+//     $('[data-src="' + $(this.audio).attr('src') + '"]')
+//   );
+//   return $item.data('next');
+// };
 
 Player.prototype.changeVolume = function(volume) {
-  this.audio.volume = volume;
+  this.audioEl.volume = volume;
 };
 
 Player.prototype.muteAudio = function() {
-  this.storedVolume = this.audio.volume;
+  this.storedVolume = this.audioEl.volume;
 
   this.displayMutedState();
   this.changeVolume(0);
@@ -416,17 +442,17 @@ Player.prototype.unmuteAudio = function() {
 Player.prototype.displayDuration = function() {
   var duration;
 
-  if (this.audio.duration !== Infinity) {
-    duration = this.formatTime.toFormatted(this.audio.duration);
-    this.$duration.html(duration);
+  if (this.audioEl.duration !== Infinity) {
+    duration = toFormatted(this.audioEl.duration);
+    this.durationEl.innerHTML = duration;
   }
 };
 
 // Changes the current time numbers while playing
 Player.prototype.displayCurrentTime = function() {
-  var currentTime = this.formatTime.toFormatted(this.audio.currentTime);
-  this.$currentTime.html(currentTime);
-  if (this.audio.duration === Infinity) {
+  var currentTime = toFormatted(this.audioEl.currentTime);
+  this.currentTimeEl.innerHTML = currentTime;
+  if (this.audioEl.duration === Infinity) {
     return;
   } else {
     this.updateTimelineProgress();
@@ -437,8 +463,8 @@ Player.prototype.displayCurrentTime = function() {
 
 // Modifies timeline length based on progress
 Player.prototype.updateTimelineProgress = function() {
-  var progress = (this.audio.currentTime / this.audio.duration) * 100;
-  this.$timelineProgress.css('width', progress + '%');
+  var progress = (this.audioEl.currentTime / this.audioEl.duration) * 100;
+  this.timelineProgressEl.style.width = progress + '%';
 };
 
 // Show the portions of the file that have been downloaded
@@ -447,29 +473,27 @@ Player.prototype.displayTimeRanges = function() {
   if (this.isPlaying !== true) {
     return;
   }
-  if (this.audio.duration === Infinity) {
+  if (this.audioEl.duration === Infinity) {
     return;
   }
 
-  for (var i = 0; i < this.audio.buffered.length; i++) {
-    var currentBuffer = this.audio.buffered.length - 1 - i;
+  for (var i = 0; i < this.audioEl.buffered.length; i++) {
+    var currentBuffer = i;
 
-    if (this.audio.buffered.start(currentBuffer) < this.audio.currentTime) {
-      var startX = this.audio.buffered.start(currentBuffer);
-      var endX = this.audio.buffered.end(currentBuffer);
-      var posXPercent = (startX / this.audio.duration) * 100;
-      var widthPercent = ((endX - startX) / this.audio.duration) * 100;
-      var $timeRanges = this.$timelineBuffered.children();
-      var timeRangeCss = {
-        left: posXPercent + '%',
-        width: widthPercent + '%'
-      };
+    if (this.audioEl.buffered.start(currentBuffer) < this.audioEl.currentTime) {
+      var startX = this.audioEl.buffered.start(currentBuffer);
+      var endX = this.audioEl.buffered.end(currentBuffer);
+      var posXPercent = (startX / this.audioEl.duration) * 100;
+      var widthPercent = ((endX - startX) / this.audioEl.duration) * 100;
+      var timeRangeEls = this.timelineBufferedEl.children;
 
-      if ($timeRanges.eq(currentBuffer).length) {
-        $timeRanges.eq(currentBuffer).css(timeRangeCss);
+      if (timeRangeEls[currentBuffer]) {
+        timeRangeEls[currentBuffer].style.left = posXPercent + '%';
+        timeRangeEls[currentBuffer].style.width = widthPercent + '%';
       } else {
-        this.$timelineBuffered.append('<div></div>');
-        $timeRanges.eq(currentBuffer).css(timeRangeCss);
+        this.timelineBufferedEl.appendChild(document.createElement('div'));
+        timeRangeEls[currentBuffer].style.left = posXPercent + '%';
+        timeRangeEls[currentBuffer].style.width = widthPercent + '%';
       }
     }
   }
@@ -477,86 +501,92 @@ Player.prototype.displayTimeRanges = function() {
 
 // Modifies the play/pause button state
 Player.prototype.displayPlayedState = function() {
-  this.$el.removeClass(PAUSED_CLASS);
-  this.$el.addClass(PLAYING_CLASS);
+  this.el.classList.remove(PAUSED_CLASS);
+  this.el.classList.add(PLAYING_CLASS);
 
-  if (this.hasPlaylist === true) {
-    this.playlist.displayPlayedState(this.getPlaylistItem());
-  }
+  // TODO split out playlist
+  // if (this.hasPlaylist === true) {
+  //   this.playlist.displayPlayedState(this.getPlaylistItem());
+  // }
 };
 
 // Modifies the play/pause button state
 Player.prototype.displayPausedState = function() {
-  this.$el.removeClass(PLAYING_CLASS);
-  this.$el.addClass(PAUSED_CLASS);
+  this.el.classList.remove(PLAYING_CLASS);
+  this.el.classList.add(PAUSED_CLASS);
 
-  if (this.hasPlaylist === true) {
-    this.playlist.displayPausedState(this.getPlaylistItem());
-  }
+  // TODO split out playlist
+  // if (this.hasPlaylist === true) {
+  //   this.playlist.displayPausedState(this.getPlaylistItem());
+  // }
 };
 
 // Modifies the timeline
 Player.prototype.displayPlayingState = function() {
   this.removeBufferingState();
 
-  if (this.hasPlaylist === true) {
-    this.playlist.displayPlayingState(this.getPlaylistItem());
-  }
+  // TODO split out playlist
+  // if (this.hasPlaylist === true) {
+  //   this.playlist.displayPlayingState(this.getPlaylistItem());
+  // }
 };
 
 // Modifies the timeline, button displays paused state
 Player.prototype.displayStoppedState = function() {
-  this.$el.removeClass(PLAYING_CLASS);
-  this.$el.removeClass(PAUSED_CLASS);
+  this.el.classList.remove(PLAYING_CLASS);
+  this.el.classList.remove(PAUSED_CLASS);
   this.removeBufferingState();
 
-  if (this.hasPlaylist === true) {
-    this.playlist.removeDisplayStates();
-  }
+  // TODO split out playlist
+  // if (this.hasPlaylist === true) {
+  //   this.playlist.removeDisplayStates();
+  // }
 };
 
 // Adds buffering styles to timeline
 Player.prototype.displayBufferingState = function() {
-  this.$el.addClass(LOADING_CLASS);
+  this.el.classList.add(LOADING_CLASS);
 
-  if (this.hasPlaylist === true) {
-    this.playlist.displayBufferingState(this.getPlaylistItem());
-  }
+  // TODO split out playlist
+  // if (this.hasPlaylist === true) {
+  //   this.playlist.displayBufferingState(this.getPlaylistItem());
+  // }
 };
 
 // Removes buffering styles from timeline
 Player.prototype.removeBufferingState = function() {
-  this.$el.removeClass(LOADING_CLASS);
+  this.el.classList.remove(LOADING_CLASS);
 
-  if (this.hasPlaylist === true) {
-    this.playlist.removeBufferingState(this.getPlaylistItem());
-  }
+  // TODO split out playlist
+  // if (this.hasPlaylist === true) {
+  //   this.playlist.removeBufferingState(this.getPlaylistItem());
+  // }
 };
 
 Player.prototype.displayCurrentVolume = function() {
-  var volumePercent = this.audio.volume * 100;
+  var volumePercent = this.audioEl.volume * 100;
 
-  if (this.audio.volume === 0) {
+  if (this.audioEl.volume === 0) {
     this.displayMutedState();
   } else {
     this.displayUnmutedState();
   }
 
-  if (this.$volumeBar.data('volume-direction') === 'h') {
-    this.$currentVolume.css('width', volumePercent + '%');
+  if (this.volumeBarEl.getAttribute('data-volume-direction') === 'h') {
+    this.currentVolumeEl.style.width = volumePercent + '%';
   } else {
-    this.$currentVolume.css('height', volumePercent + '%');
+    this.currentVolumeEl.style.height = volumePercent + '%';
   }
 
   return this;
 };
 
 Player.prototype.displayMutedState = function() {
-  this.$el.addClass(MUTED_CLASS);
+  this.el.classList.add(MUTED_CLASS);
 };
 
 Player.prototype.displayUnmutedState = function() {
-  this.$el.removeClass(MUTED_CLASS);
+  this.el.classList.remove(MUTED_CLASS);
 };
 
 export default Player;
