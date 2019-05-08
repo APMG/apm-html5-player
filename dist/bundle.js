@@ -59,7 +59,7 @@
     this.isPlaying = false;
 
     // The src that will be used for audio
-    this.src = this.el.getAttribute('data-src');
+    this.dataSrc = this.el.getAttribute('data-src');
 
     // A variable to store the previous volume the player was set at.
     this.storedVolume = 1;
@@ -119,6 +119,12 @@
   };
 
   Player.prototype.getSources = function() {
+    try {
+      this.sources = JSON.parse(this.dataSrc.replace(/'/g, '"'));
+    } catch (e) {
+      this.sources = this.dataSrc;
+    }
+
     return this;
   };
 
@@ -194,7 +200,7 @@
 
     if (this.isPlaying === false) {
       if (this.audioEl.readyState === 0) {
-        this.loadAudioFromSrc(this.src);
+        this.loadAudioFromSources(this.sources);
       }
       this.playAudio();
     } else {
@@ -334,8 +340,38 @@
   // Audio Element Methods
   // -----------------------------
 
-  Player.prototype.loadAudioFromSrc = function(src) {
-    this.audioEl.src = src;
+  Player.prototype.loadAudioFromSources = function(sources) {
+    // Clear any existing <source> elements
+    this.audioEl.innerHTML = '';
+
+    if (typeof sources === 'string') {
+      // Turn a string value into an array with one item
+      // This is in this function so that loadAudioFromSrc()
+      // can be called externally with a string if needed
+      sources = sources.split();
+    }
+
+    this.createSourceEls(sources);
+    this.audioEl.load();
+  };
+
+  Player.prototype.createSourceEls = function(sources) {
+    var self = this;
+    // Append <source> elements to the <audio> element
+    sources.forEach(function(source) {
+      var sourceEl = document.createElement('source');
+      sourceEl.setAttribute('src', source);
+      sourceEl.setAttribute('type', self.getSourceType(source));
+      self.audioEl.appendChild(sourceEl);
+    });
+  };
+
+  Player.prototype.getSourceType = function(source) {
+    if (/(\.aac)$/.test(source)) {
+      return 'audio/mp4';
+    } else if (/(\.mp3)$/.test(source)) {
+      return 'audio/mp3';
+    }
   };
 
   Player.prototype.sendToNielsen = function(key, value) {
@@ -346,7 +382,10 @@
 
   Player.prototype.unloadAudio = function() {
     this.isPlaying = false;
-    this.audioEl.src = '';
+    // Remove inner <source> elements
+    this.audioEl.innerHTML = '';
+    // Forces the audio element to read the (nonexistent) <source> elements and update
+    this.audioEl.load();
     this.displayStoppedState();
     this.sendToNielsen('stop', Date.now() / 1000);
   };
