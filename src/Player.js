@@ -42,6 +42,7 @@ Player.prototype.init = function() {
   this.selectElements()
     // TODO split out playlist
     // .initPlaylist()
+    .getSources()
     .bindEventHandlers()
     .initTime()
     .displayCurrentVolume();
@@ -68,12 +69,16 @@ Player.prototype.selectElements = function() {
     this.volumeBarEl.querySelector('.js-player-volume-current');
   this.muteButtonEl = this.el.querySelector('.js-player-mute');
   // Info
-  this.timeEl = this.el.querySelector('.js-player-time');
   this.durationEl = this.el.querySelector('.js-player-duration');
   this.currentTimeEl = this.el.querySelector('.js-player-currentTime');
-  this.titleEl = this.el.querySelector('.js-player-title');
-  this.artistEl = this.el.querySelector('.js-player-artist');
+  // TODO: split out playlist
+  // this.titleEl = this.el.querySelector('.js-player-title');
+  // this.artistEl = this.el.querySelector('.js-player-artist');
 
+  return this;
+};
+
+Player.prototype.getSources = function() {
   return this;
 };
 
@@ -438,6 +443,9 @@ Player.prototype.unmuteAudio = function() {
 
 // Displays the length of the audio file
 Player.prototype.displayDuration = function() {
+  // Exit if no duration element in DOM
+  if (!this.durationEl) return;
+
   var duration;
 
   if (this.audioEl.duration !== Infinity) {
@@ -448,6 +456,9 @@ Player.prototype.displayDuration = function() {
 
 // Changes the current time numbers while playing
 Player.prototype.displayCurrentTime = function() {
+  // Exit if current time element isn't in DOM
+  if (!this.currentTimeEl) return;
+
   var currentTime = toFormatted(this.audioEl.currentTime);
   this.currentTimeEl.innerHTML = currentTime;
   if (this.audioEl.duration === Infinity) {
@@ -461,6 +472,9 @@ Player.prototype.displayCurrentTime = function() {
 
 // Modifies timeline length based on progress
 Player.prototype.updateTimelineProgress = function() {
+  // Exit if there is no timeline in DOM
+  if (!this.timelineEl) return;
+
   var progress = (this.audioEl.currentTime / this.audioEl.duration) * 100;
   this.timelineProgressEl.style.width = progress + '%';
 };
