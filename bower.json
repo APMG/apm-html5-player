@@ -26,6 +26,7 @@
     "rollup.config.js",
     "src",
     "test",
-    "tests"
+    "tests",
+    "yarn.lock"
   ]
 }
