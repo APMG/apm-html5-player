@@ -3,6 +3,6 @@ export default {
   output: {
     file: 'dist/bundle.js',
     format: 'umd',
-    name: 'apm-html5-player'
+    name: 'ApmPlayer'
   }
-}
+};

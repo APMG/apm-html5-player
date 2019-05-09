@@ -1,7 +1,7 @@
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
   typeof define === 'function' && define.amd ? define(['exports'], factory) :
-  (global = global || self, factory(global['apm-html5-player'] = {}));
+  (global = global || self, factory(global.ApmPlayer = {}));
 }(this, function (exports) { 'use strict';
 
   // Formats an ugly time (in seconds) to a nice readable format
@@ -57,9 +57,6 @@
 
     // The playing/paused state of the Player
     this.isPlaying = false;
-
-    // The src that will be used for audio
-    this.dataSrc = this.el.getAttribute('data-src');
 
     // A variable to store the previous volume the player was set at.
     this.storedVolume = 1;
@@ -119,10 +116,13 @@
   };
 
   Player.prototype.getSources = function() {
+    // Get data-src attribute each time this is called in case the attribute changes
     try {
-      this.sources = JSON.parse(this.dataSrc.replace(/'/g, '"'));
+      this.sources = JSON.parse(
+        this.el.getAttribute('data-src').replace(/'/g, '"')
+      );
     } catch (e) {
-      this.sources = this.dataSrc;
+      this.sources = this.el.getAttribute('data-src');
     }
 
     return this;
@@ -200,6 +200,8 @@
 
     if (this.isPlaying === false) {
       if (this.audioEl.readyState === 0) {
+        // get sources from data attribute in case it changed
+        this.getSources();
         this.loadAudioFromSources(this.sources);
       }
       this.playAudio();
@@ -341,6 +343,9 @@
   // -----------------------------
 
   Player.prototype.loadAudioFromSources = function(sources) {
+    // Remove the src attribute on the audio element in case it was left in the HTML.
+    // An empty src attribute will interfere with the inner <source> elements.
+    this.audioEl.removeAttribute('src');
     // Clear any existing <source> elements
     this.audioEl.innerHTML = '';
 
@@ -359,17 +364,36 @@
     var self = this;
     // Append <source> elements to the <audio> element
     sources.forEach(function(source) {
+      var sourceUrl;
+      var sourceType;
+
+      // if using a source object, get the type from the object,
+      // fall back to figure it out based on the filename
+      if (typeof source === 'object' && !Array.isArray(source)) {
+        sourceUrl = source.url;
+        sourceType = source.type;
+      } else {
+        sourceUrl = source;
+        sourceType = self.getSourceType(source);
+      }
+
+      // Generate the html
       var sourceEl = document.createElement('source');
-      sourceEl.setAttribute('src', source);
-      sourceEl.setAttribute('type', self.getSourceType(source));
+      sourceEl.setAttribute('src', sourceUrl);
+      sourceEl.setAttribute('type', sourceType);
       self.audioEl.appendChild(sourceEl);
     });
   };
 
   Player.prototype.getSourceType = function(source) {
-    if (/(\.aac)$/.test(source)) {
+    // We don't test for only the end of the filename in case
+    // there is a cache busting string on the end
+    var aacReg = /(\.aac)/;
+    var mp3Reg = /(\.mp3)/;
+
+    if (aacReg.test(source)) {
       return 'audio/mp4';
-    } else if (/(\.mp3)$/.test(source)) {
+    } else if (mp3Reg.test(source)) {
       return 'audio/mp3';
     }
   };
