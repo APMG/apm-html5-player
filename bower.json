@@ -1,6 +1,6 @@
 {
   "name": "apm-html5-player",
-  "version": "1.0.0-beta.0",
+  "version": "1.0.0-beta.1",
   "authors": [
     "Matt Aho <maho@mpr.org>",
     "Geoffrey Hankerson <ghankerson@mpr.org>"
@@ -20,6 +20,11 @@
     "node_modules",
     "bower_components",
     "demos",
+    "jest.config.js",
+    "package.json",
+    "package-lock.json",
+    "rollup.config.js",
+    "src",
     "test",
     "tests"
   ]
