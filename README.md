@@ -28,6 +28,9 @@ The library was designed for backwards compatibility with older javascript build
 - [Player State](#player-state)
   - [Player State Classes](#player-state-classes)
   - [Player State Example](#player-state-example)
+- [JS Setup](#js-setup)
+  - [ES6/Require.js Setup](#es6requirejs-setup)
+  - [Global Setup](#global-setup)
 
 [Development Setup](#development-setup)
 
@@ -140,7 +143,7 @@ It is invoked on a particular DOM element and expects various child elements to 
 
 ### DOM Structure
 
-At a minimum, the library needs a containing element and an `<audio>` element in order to function. The containing DOM element should have the class `js-player`:
+At a minimum, the library needs a containing element and an `<audio>` element in order to function. You can use any selector you want for this containing element, but subsequent examples assume we're using the class `js-player`:
 
 ```html
 <div class="js-player">
@@ -167,10 +170,7 @@ Other DOM elements used by the library are selected by the following classes:
 The actual structure of the DOM is flexible, allowing for lots of different possible layouts, but here's an example of what it could look like (taken from The Current and abbreviated):
 
 ```html
-<div
-  class="player js-player"
-  data-src="//current.stream.publicradio.org/kcmp.mp3"
->
+<div class="player js-player" data-src="//current.stream.publicradio.org/kcmp.mp3">
   <audio></audio>
   <div class="player-main">
     <button type="button" class="player-control js-player-play" tabindex="0">
@@ -236,22 +236,48 @@ For example, to alternate between the play and pause icons, you might do somethi
 
 ```css
 /* The default state, shows the play icon */
-.player-play {
-  display: block;
-}
+.player-play { display: block; }
 
 /* The default state, hides the pause icon */
-.player-pause {
-  display: none;
-}
+.player-pause { display: none; }
 
 /* Using the is-playing class applied to containing .js-player to show the pause icon and hide the play icon */
-.is-playing .player-play {
-  display: none;
-}
-.is-playing .player-pause {
-  display: block;
-}
+.is-playing .player-play { display: none; }
+.is-playing .player-pause { display: block; }
+```
+
+### JS Setup
+
+Invoking the library in your app is fairly straightforward, and can be done in a few different ways depending on how you included the script in your app.
+
+#### ES6/Require.js Setup
+
+Assuming you imported or required the player using the existing exported name `Player` into your js file, invoke the script on your DOM element:
+
+```javascript
+// your custom js file
+
+// The DOM element container
+const playerElement = document.querySelector('js-player');
+// Create new instance of the Player class
+const player = new Player(playerElement);
+
+// Don't forget to initialize
+player.init();
+```
+
+#### Global Setup
+
+If you included the player library in your project in a `<script>` tag, the name in the global namespace is `ApmPlayer`. Otherwise usage is pretty similar to the ES6 example above:
+
+```javascript
+// your custom js file
+
+var playerElement = document.querySelector('js-player');
+var player = new window.ApmPlayer(playerElement);
+
+// initialize the player
+player.init();
 ```
 
 ## Development setup
