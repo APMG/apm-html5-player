@@ -52,7 +52,7 @@ Player.prototype.selectElements = function() {
   // The audio element used for playback
   this.audioEl = this.el.querySelector('audio');
   // Controls
-  this.playButtonEl = this.el.querySelector('.js-player-play');
+  this.playButtonEls = this.el.querySelectorAll('.js-player-play');
   this.skipForwardButtonEl = this.el.querySelector('[data-skip-forward]');
   this.skipBackButtonEl = this.el.querySelector('[data-skip-back]');
   this.timelineEl = this.el.querySelector('.js-player-timeline');
@@ -79,9 +79,15 @@ Player.prototype.getSources = function() {
   // Get data-src attribute each time this is called in case the attribute changes
   try {
     this.sources = JSON.parse(
-      this.el.getAttribute('data-src').replace(/'/g, '"')
+      // decodeURI is used in case any URL characters (like %20 for spaces) are in the string
+      decodeURI(this.el.getAttribute('data-src')).replace(/'/g, '"')
     );
   } catch (e) {
+    if (typeof console !== 'undefined') {
+      // eslint-disable-next-line
+      console.log(e);
+    }
+
     this.sources = this.el.getAttribute('data-src');
   }
 
@@ -90,9 +96,14 @@ Player.prototype.getSources = function() {
 
 // Setup and bind event handlers
 Player.prototype.bindEventHandlers = function() {
+  var self = this;
+
   // Click events
-  this.playButtonEl &&
-    this.playButtonEl.addEventListener('click', this.onPlayClick.bind(this));
+
+  // Apply click event to all play buttons
+  Array.prototype.forEach.call(this.playButtonEls, function(el) {
+    el.addEventListener('click', self.onPlayClick.bind(self));
+  });
 
   this.skipForwardButtonEl &&
     this.skipForwardButtonEl.addEventListener(

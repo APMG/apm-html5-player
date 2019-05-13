@@ -274,7 +274,7 @@ If you included the player library in your project in a `<script>` tag, the name
 // your custom js file
 
 var playerElement = document.querySelector('js-player');
-var player = new window.ApmPlayer(playerElement);
+var player = new window.ApmPlayer.Player(playerElement);
 
 // initialize the player
 player.init();
