@@ -17,7 +17,8 @@ The library was designed for backwards compatibility with older javascript build
 [Importing](#importing)
 
 - [ES6 Import](#es6-import)
-- [Require.js](#requirejs)
+- [CommonJS Syntax](#commonjs-syntax)
+- [Require.js Syntax](#requirejs-syntax)
 - [Script tag](#script-tag)
 
 [Usage](#usage)
@@ -25,6 +26,10 @@ The library was designed for backwards compatibility with older javascript build
 - [DOM Structure](#dom-structure)
   - [Inner Elements](#inner-elements)
   - [DOM Example](#dom-example)
+- [Audio Formats](#audio-formats)
+  - [Audio object array](#audio-object-array)
+  - [Audio filename array](#audio-filename-array)
+  - [Audio string](#audio-string)
 - [Player State](#player-state)
   - [Player State Classes](#player-state-classes)
   - [Player State Example](#player-state-example)
@@ -70,11 +75,11 @@ The package isn't registered with bower, so we have to reference the git url. If
 
 Add the package to your `bower.json` file:
 
-```js
+```javascript
 // in bower.json
 
 "dependencies": {
-  "apm-html5-player": "git@github.com:APMG/apm-html5-player.git#1.0.0",
+  "apm-html5-player": "https://github.com/APMG/apm-html5-player.git#1.0.0",
 }
 ```
 
@@ -105,13 +110,34 @@ If you need the player with the analytics plugin:
 import { Player, AudioAnalytics } from 'apm-html5-player';
 ```
 
-### Require.js
+### CommonJs Syntax
 
-If your app uses require.js for module importing, you can access the named modules like this:
+You can also use CommonJS `require()` functions to import the named modules like this:
 
 ```javascript
 var Player = require('apm-html5-player').Player;
 var AudioAnalytics = require('apm-html5-player').AudioAnalytics;
+```
+
+If using Require.js, this is the preferred syntax because it's easier to understand. To use a named package as demonstrated in the example above (the `'apm-html5-player'` string), you'll need to set up the module in Require.js's [`paths`](https://requirejs.org/docs/api.html#config-paths) config. Alternatively it can be referenced with a relative file path in the `require()` function.
+
+### Require.js Syntax
+
+If your app uses old-style require.js syntax for module importing, you can access the named modules like this, assuming Require.js's `paths` is configured:
+
+```javascript
+// Creates a new Player and AudioAnalytics
+requirejs(['player'], function(ApmPlayer){
+  // Get the DOM element
+  var playerElement = document.getElementById('js-player');
+
+  // Invoke the constructors
+  var player = new ApmPlayer.player(playerElement);
+  var analytics = new ApmPlayer.AudioAnalytics();
+
+  // Initialize the player
+  player.init();
+}
 ```
 
 ### Script tag
@@ -213,6 +239,92 @@ The actual structure of the DOM is flexible, allowing for lots of different poss
 ```
 
 Notice the additional classes used on elements with `js-*` classes. The additional classes should be used for styling, not the `js-*` classes, as those are meant to be only javascript hooks.
+
+### Audio Formats
+
+URLs to the audio files should be supplied to the `data-src` attribute on the main container element (`.js-player` in this example).
+Once playback is initiated, the library will create the appropriate `<source>` element(s) inside the `<audio>` element and load the correct audio source before finally beginning playback.
+
+The player can handle multiple audio sources, allowing the browser to use fallback formats if the OS or browser don't have the preferred codecs.
+
+#### Audio object array
+
+The most explicit, and generally preferred, way of defining the audio used in the player is by supplying an array with objects that detail the url and type of audio.
+This is preferred if you know what formats your audio use so that the library doesn't have to guess based on the file extension.
+
+Assume a JSON object that looks like this:
+
+```json
+[
+  {
+    "url": "https://example.com/my-audio.aac",
+    "type": "audio/mp4"
+  },
+  {
+    "url": "https://example.com/my-audio.mp3",
+    "type": "audio/mp3"
+  }
+]
+```
+
+This provides a file in the AAC codec, which should use the `audio/mp4` file container type as the preferred format, and the browser will fall back to the MP3 file (type `audio/mp3`) if it can't play AAC audio.
+
+To apply this to the DOM it should look like this. The JSON can use single quotes here instead of double quotes if preferred:
+
+```html
+<div class="js-player" data-src="[{'url': 'https://example.com/my-audio.aac', 'type': 'audio/mp4'}, {'url': 'https://example.com/my-audio.mp3', 'type': 'audio/mp3'}]">
+  <audio></audio>
+</div>
+```
+
+For reference, once this is parsed by the library after playback has been initiated, the `<audio>` element looks like this:
+
+```html
+<audio>
+  <source src="https://example.com/my-audio.aac" type="audio/mp4">
+  <source src="https://example.com/my-audio.mp3" type="audio/mp3">
+</audio>
+```
+
+#### Audio filename array
+
+If your data source that provides the audio urls doesn't provide information about the codec, you can just pass an array of url strings and the library will try to figure out the MIME types based on the filename:
+
+```html
+<div class="js-player" data-src="['https://example.com/my-audio.aac', 'https://example.com/my-audio.aac', 'https://example.com/my-audio.mp3']">
+  <audio></audio>
+</div>
+```
+
+Resulting in:
+
+```html
+<audio>
+  <source src="https://example.com/my-audio.aac" type="audio/mp4">
+  <source src="https://example.com/my-audio.ogg" type="audio/ogg">
+  <source src="https://example.com/my-audio.mp3" type="audio/mp3">
+</audio>
+```
+
+If the library can't tell what `type` a file is, it will omit the `type` attribute from that `<source>` element. The browser may still be able to play that audio file.
+
+#### Audio string
+
+The library also accepts a simple string as the `data-src`:
+
+```html
+<div class="js-player" data-src="https://example.com/my-audio.mp3">
+  <audio></audio>
+</div>
+```
+
+Resulting in:
+
+```html
+<audio>
+  <source src="https://example.com/my-audio.mp3" type="audio/mp3">
+</audio>
+```
 
 ### Player State
 
