@@ -84,7 +84,8 @@ Player.prototype.getSources = function() {
   } catch (e) {
     if (typeof console !== 'undefined') {
       // If the error is anything other than not evaluating to JSON, print to console
-      if (!/^\s*SyntaxError: Unexpected token/.test(e)) {
+      var syntaxReg = /^\s*SyntaxError: Unexpected token|^\s*SyntaxError: Unexpected end of JSON input/;
+      if (!syntaxReg.test(e)) {
         // eslint-disable-next-line
         console.log(e);
       }
