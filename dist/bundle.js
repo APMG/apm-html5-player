@@ -39,6 +39,124 @@
     return formattedTime;
   }
 
+  // Required modules for page load
+
+  // Constructor
+  // The 'parent' argument passed in is the parent object from Player.js.
+  // This script is only intended to be used with that Player.js.
+  var Playlist = function(parent) {
+    this.player = parent;
+    // The containing DOM element
+    this.el = this.player.playlistEl;
+  };
+
+  // -----------------------------
+  // Setup functions
+  // -----------------------------
+
+  Playlist.prototype.init = function() {
+    this.selectElements()
+      .setNextItem()
+      .bindEventHandlers();
+  };
+
+  Playlist.prototype.selectElements = function() {
+    this.itemEls = this.el.querySelectorAll('.js-playlist-item');
+
+    return this;
+  };
+
+  Playlist.prototype.setNextItem = function() {
+    Array.prototype.forEach.call(this.itemEls, function(currentItemEl) {
+      var nextItemEl = currentItemEl.nextElementSibling;
+      var nextSrc;
+
+      if (!nextItemEl) {
+        return;
+      }
+
+      nextSrc = nextItemEl.getAttribute('data-src');
+      currentItemEl.setAttribute('data-next', nextSrc);
+    });
+
+    return this;
+  };
+
+  Playlist.prototype.bindEventHandlers = function() {
+    var self = this;
+
+    Array.prototype.forEach.call(this.itemEls, function(el) {
+      el.addEventListener('click', self.onItemClick.bind(self));
+    });
+
+    return this;
+  };
+
+  // -----------------------------
+  // Event Handlers
+  // -----------------------------
+
+  Playlist.prototype.onItemClick = function(e) {
+    e.preventDefault();
+    var targetEl = e.currentTarget;
+    var src = targetEl.getAttribute('data-src');
+    var title = targetEl.getAttribute('data-title');
+    var artist = targetEl.getAttribute('data-artist');
+
+    this.player.el.setAttribute('data-src', src);
+    this.player.loadAudioFromSources(src);
+    this.player.playAudio();
+    this.displayPlayedState(targetEl);
+    this.displayBufferingState(targetEl);
+    this.populatePlayerInfo(title, artist);
+  };
+
+  // -----------------------------
+  // Helpers
+  // -----------------------------
+
+  Playlist.prototype.displayPlayedState = function(el) {
+    this.removeDisplayStates();
+    el.classList.add('is-playing');
+  };
+
+  Playlist.prototype.displayPlayingState = function(el) {
+    this.removeBufferingState(el);
+    this.removePausedState(el);
+  };
+
+  Playlist.prototype.displayPausedState = function(el) {
+    el.classList.add('is-paused');
+  };
+
+  Playlist.prototype.removePausedState = function(el) {
+    el.classList.remove('is-paused');
+  };
+
+  Playlist.prototype.displayBufferingState = function(el) {
+    el.classList.add('is-loading');
+  };
+
+  Playlist.prototype.removeBufferingState = function(el) {
+    el.classList.remove('is-loading');
+  };
+
+  Playlist.prototype.removeDisplayStates = function() {
+    var self = this;
+
+    Array.prototype.forEach.call(this.itemEls, function(el) {
+      self.removeBufferingState(el);
+      self.removePausedState(el);
+      el.classList.remove('is-playing');
+      el.classList.remove('is-active');
+    });
+  };
+
+  Playlist.prototype.populatePlayerInfo = function(title, artist) {
+    this.player.titleEl.textContent = title;
+    this.player.artistEl.textContent = artist;
+  };
+
   // import Playlist from './Playlist';
 
   // Constants
@@ -77,8 +195,7 @@
   // Initialize the module
   Player.prototype.init = function() {
     this.selectElements()
-      // TODO split out playlist
-      // .initPlaylist()
+      .initPlaylist()
       .getSources()
       .bindEventHandlers()
       .initTime()
@@ -108,9 +225,8 @@
     // Info
     this.durationEl = this.el.querySelector('.js-player-duration');
     this.currentTimeEl = this.el.querySelector('.js-player-currentTime');
-    // TODO: split out playlist
-    // this.titleEl = this.el.querySelector('.js-player-title');
-    // this.artistEl = this.el.querySelector('.js-player-artist');
+    this.titleEl = this.el.querySelector('.js-player-title');
+    this.artistEl = this.el.querySelector('.js-player-artist');
 
     return this;
   };
@@ -124,8 +240,11 @@
       );
     } catch (e) {
       if (typeof console !== 'undefined') {
-        // eslint-disable-next-line
-        console.log(e);
+        // If the error is anything other than not evaluating to JSON, print to console
+        if (!/^\s*SyntaxError: Unexpected token/.test(e)) {
+          // eslint-disable-next-line
+          console.log(e);
+        }
       }
 
       this.sources = this.el.getAttribute('data-src');
@@ -191,16 +310,15 @@
     return this;
   };
 
-  // TODO: split out playlist
-  // Player.prototype.initPlaylist = function() {
-  //   if (this.playlistEl.length) {
-  //     this.playlist = new Playlist(this);
-  //     this.playlist.init();
-  //     this.hasPlaylist = true;
-  //   }
+  Player.prototype.initPlaylist = function() {
+    if (this.playlistEl) {
+      this.playlist = new Playlist(this);
+      this.playlist.init();
+      this.hasPlaylist = true;
+    }
 
-  //   return this;
-  // };
+    return this;
+  };
 
   // -----------------------------
   // Event Handlers
@@ -324,10 +442,9 @@
   // finished for the current file
   Player.prototype.onAudioEnded = function() {
     this.displayStoppedState();
-    // TODO: split out playlist
-    // if (this.hasPlaylist === true) {
-    //   this.playNext();
-    // }
+    if (this.hasPlaylist === true) {
+      this.playNext();
+    }
   };
 
   // HTMLMediaElement 'volumechange' event fires when the audio's
@@ -362,7 +479,7 @@
 
     if (typeof sources === 'string') {
       // Turn a string value into an array with one item
-      // This is in this function so that loadAudioFromSrc()
+      // This is in this function so that loadAudioFromSources()
       // can be called externally with a string if needed
       sources = sources.split();
     }
@@ -391,7 +508,10 @@
       // Generate the html
       var sourceEl = document.createElement('source');
       sourceEl.setAttribute('src', sourceUrl);
-      sourceEl.setAttribute('type', sourceType);
+      // Only set a type if sourceType is not null
+      if (sourceType !== null) {
+        sourceEl.setAttribute('type', sourceType);
+      }
       self.audioEl.appendChild(sourceEl);
     });
   };
@@ -399,13 +519,24 @@
   Player.prototype.getSourceType = function(source) {
     // We don't test for only the end of the filename in case
     // there is a cache busting string on the end
-    var aacReg = /(\.aac)/;
-    var mp3Reg = /(\.mp3)/;
+    var aacReg = /\.aac/;
+    var mp4Reg = /\.mp4/;
+    var m4aReg = /\.m4a/;
+    var oggReg = /\.ogg|\.oga/;
+    var mp3Reg = /\.mp3/;
 
     if (aacReg.test(source)) {
+      return 'audio/aac';
+    } else if (mp4Reg.test(source)) {
       return 'audio/mp4';
+    } else if (oggReg.test(source)) {
+      return 'audio/ogg';
+    } else if (m4aReg.test(source)) {
+      return 'audio/m4a';
     } else if (mp3Reg.test(source)) {
-      return 'audio/mp3';
+      return 'audio/mpeg';
+    } else {
+      return null;
     }
   };
 
@@ -447,24 +578,26 @@
     });
   };
 
-  // TODO: Split out playlist
-  // Player.prototype.playNext = function() {
-  //   var nextSrc = this.getNextPlaylistSrc();
-  //   var nextItemEl;
+  Player.prototype.playNext = function() {
+    var nextSrc = this.getNextPlaylistSrc();
 
-  //   if (typeof nextSrc === 'undefined') return;
-  //   nextItemEl = this.findNext(nextSrc);
-  //   this.playlist.populatePlayerInfo(
-  //     nextItemEl.getAttribute('data-title'),
-  //     nextItemEl.getAttribute('data-artist')
-  //   );
-  //   this.loadAudioFromSrc(nextSrc);
-  //   this.playAudio();
-  // };
+    var nextItemEl;
 
-  // Player.prototype.findNext = function(src) {
-  //   return this.playlistEl.querySelector("li[data-src='" + src + "']");
-  // };
+    if (typeof nextSrc === 'undefined' || nextSrc === null) return;
+
+    this.el.setAttribute('data-src', nextSrc);
+    nextItemEl = this.findNext(nextSrc);
+    this.playlist.populatePlayerInfo(
+      nextItemEl.getAttribute('data-title'),
+      nextItemEl.getAttribute('data-artist')
+    );
+    this.loadAudioFromSources(nextSrc);
+    this.playAudio();
+  };
+
+  Player.prototype.findNext = function(src) {
+    return this.playlistEl.querySelector('li[data-src="' + src + '"]');
+  };
 
   Player.prototype.getSecondsByClickPosition = function(element, clickXPosition) {
     var timelineRect = element.getBoundingClientRect();
@@ -519,21 +652,19 @@
     return volume;
   };
 
-  // TODO: Should probably move all playlist stuff out of here
-  //
-  // Player.prototype.getPlaylistItem = function() {
-  //   var $item = this.playlist.items.filter(
-  //     $('[data-src="' + $(this.audio).attr('src') + '"]')
-  //   );
-  //   return $item;
-  // };
+  Player.prototype.getCurrentPlaylistItem = function() {
+    var srcString = this.el.getAttribute('data-src');
+    var items = Array.prototype.filter.call(this.playlist.itemEls, function(el) {
+      return el.matches('[data-src="' + srcString + '"]');
+    });
+    var itemEl = items[0];
+    return itemEl;
+  };
 
-  // Player.prototype.getNextPlaylistSrc = function() {
-  //   var $item = this.playlist.$items.filter(
-  //     $('[data-src="' + $(this.audio).attr('src') + '"]')
-  //   );
-  //   return $item.data('next');
-  // };
+  Player.prototype.getNextPlaylistSrc = function() {
+    var itemEl = this.getCurrentPlaylistItem();
+    return itemEl.getAttribute('data-next');
+  };
 
   Player.prototype.changeVolume = function(volume) {
     this.audioEl.volume = volume;
@@ -630,10 +761,9 @@
     this.el.classList.remove(PAUSED_CLASS);
     this.el.classList.add(PLAYING_CLASS);
 
-    // TODO split out playlist
-    // if (this.hasPlaylist === true) {
-    //   this.playlist.displayPlayedState(this.getPlaylistItem());
-    // }
+    if (this.hasPlaylist === true) {
+      this.playlist.displayPlayedState(this.getCurrentPlaylistItem());
+    }
   };
 
   // Modifies the play/pause button state
@@ -641,20 +771,18 @@
     this.el.classList.remove(PLAYING_CLASS);
     this.el.classList.add(PAUSED_CLASS);
 
-    // TODO split out playlist
-    // if (this.hasPlaylist === true) {
-    //   this.playlist.displayPausedState(this.getPlaylistItem());
-    // }
+    if (this.hasPlaylist === true) {
+      this.playlist.displayPausedState(this.getCurrentPlaylistItem());
+    }
   };
 
   // Modifies the timeline
   Player.prototype.displayPlayingState = function() {
     this.removeBufferingState();
 
-    // TODO split out playlist
-    // if (this.hasPlaylist === true) {
-    //   this.playlist.displayPlayingState(this.getPlaylistItem());
-    // }
+    if (this.hasPlaylist === true) {
+      this.playlist.displayPlayingState(this.getCurrentPlaylistItem());
+    }
   };
 
   // Modifies the timeline, button displays paused state
@@ -663,30 +791,27 @@
     this.el.classList.remove(PAUSED_CLASS);
     this.removeBufferingState();
 
-    // TODO split out playlist
-    // if (this.hasPlaylist === true) {
-    //   this.playlist.removeDisplayStates();
-    // }
+    if (this.hasPlaylist === true) {
+      this.playlist.removeDisplayStates();
+    }
   };
 
   // Adds buffering styles to timeline
   Player.prototype.displayBufferingState = function() {
     this.el.classList.add(LOADING_CLASS);
 
-    // TODO split out playlist
-    // if (this.hasPlaylist === true) {
-    //   this.playlist.displayBufferingState(this.getPlaylistItem());
-    // }
+    if (this.hasPlaylist === true) {
+      this.playlist.displayBufferingState(this.getCurrentPlaylistItem());
+    }
   };
 
   // Removes buffering styles from timeline
   Player.prototype.removeBufferingState = function() {
     this.el.classList.remove(LOADING_CLASS);
 
-    // TODO split out playlist
-    // if (this.hasPlaylist === true) {
-    //   this.playlist.removeBufferingState(this.getPlaylistItem());
-    // }
+    if (this.hasPlaylist === true) {
+      this.playlist.removeBufferingState(this.getCurrentPlaylistItem());
+    }
   };
 
   Player.prototype.displayCurrentVolume = function() {
@@ -715,116 +840,6 @@
 
   Player.prototype.displayUnmutedState = function() {
     this.el.classList.remove(MUTED_CLASS);
-  };
-
-  // Required modules for page load
-
-  // Constructor
-  // The 'parent' argument passed in is the parent object from Player.js.
-  // This script is only intended to be used with that Player.js.
-  var Playlist = function(parent) {
-    this.player = parent;
-    // The containing DOM element
-    this.$el = this.player.$playlistElement;
-  };
-
-  // -----------------------------
-  // Setup functions
-  // -----------------------------
-
-  Playlist.prototype.init = function() {
-    this.selectElements()
-      .setNextItem()
-      .bindEventHandlers();
-  };
-
-  Playlist.prototype.selectElements = function() {
-    this.$items = this.$el.find('.js-playlist-item');
-
-    return this;
-  };
-
-  Playlist.prototype.setNextItem = function() {
-    this.$items.each(function() {
-      var $currentItem = $(this);
-      var $nextItem = $(this).next();
-      var nextSrc;
-
-      if ($nextItem.length === 0) {
-        return;
-      }
-
-      nextSrc = $nextItem.data('src');
-      $currentItem.attr('data-next', nextSrc);
-    });
-
-    return this;
-  };
-
-  Playlist.prototype.bindEventHandlers = function() {
-    this.$items.on('click', this.onItemClick.bind(this));
-
-    return this;
-  };
-
-  // -----------------------------
-  // Event Handlers
-  // -----------------------------
-
-  Playlist.prototype.onItemClick = function(e) {
-    e.preventDefault();
-    var $target = $(e.currentTarget);
-    var src = $target.data('src');
-    var title = $target.data('title');
-    var artist = $target.data('artist');
-
-    this.player.loadAudioFromSrc(src);
-    this.player.playAudio();
-    this.displayPlayedState($target);
-    this.displayBufferingState($target);
-    this.populatePlayerInfo(title, artist);
-  };
-
-  // -----------------------------
-  // Helpers
-  // -----------------------------
-
-  Playlist.prototype.displayPlayedState = function($item) {
-    this.removeDisplayStates();
-    $item.addClass('is-playing');
-  };
-
-  Playlist.prototype.displayPlayingState = function($item) {
-    this.removeBufferingState($item);
-    this.removePausedState($item);
-  };
-
-  Playlist.prototype.displayPausedState = function($item) {
-    $item.addClass('is-paused');
-  };
-
-  Playlist.prototype.removePausedState = function($item) {
-    $item.removeClass('is-paused');
-  };
-
-  Playlist.prototype.displayBufferingState = function($item) {
-    $item.addClass('is-loading');
-  };
-
-  Playlist.prototype.removeBufferingState = function($item) {
-    $item.removeClass('is-loading');
-  };
-
-  Playlist.prototype.removeDisplayStates = function() {
-    this.removeBufferingState(this.$items);
-    this.$items.removeClass('is-active');
-    this.$items.removeClass('is-paused');
-    this.$items.removeClass('is-playing');
-  };
-
-  Playlist.prototype.populatePlayerInfo = function(title, artist) {
-    this.player.$title.text(title);
-    this.player.$artist.text(artist);
   };
 
   var NielsenSetup = function() {};
@@ -1007,7 +1022,6 @@
   exports.AudioAnalytics = HTML5PlayerGoogleAnalytics;
   exports.NielsenSetup = NielsenSetup;
   exports.Player = Player;
-  exports.Playlist = Playlist;
 
   Object.defineProperty(exports, '__esModule', { value: true });
 

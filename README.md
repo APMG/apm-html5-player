@@ -282,7 +282,7 @@ For reference, once this is parsed by the library after playback has been initia
 ```html
 <audio>
   <source src="https://example.com/my-audio.aac" type="audio/mp4">
-  <source src="https://example.com/my-audio.mp3" type="audio/mp3">
+  <source src="https://example.com/my-audio.mp3" type="audio/mpeg">
 </audio>
 ```
 
@@ -302,11 +302,12 @@ Resulting in:
 <audio>
   <source src="https://example.com/my-audio.aac" type="audio/mp4">
   <source src="https://example.com/my-audio.ogg" type="audio/ogg">
-  <source src="https://example.com/my-audio.mp3" type="audio/mp3">
+  <source src="https://example.com/my-audio.mp3" type="audio/mpeg">
 </audio>
 ```
 
-If the library can't tell what `type` a file is, it will omit the `type` attribute from that `<source>` element. The browser may still be able to play that audio file.
+If the library can't tell what `type` a file is from the filename, it will omit the `type` attribute from that `<source>` element.
+The browser may still be able to play that audio file, but it might not work correctly.
 
 #### Audio string
 
@@ -322,7 +323,7 @@ Resulting in:
 
 ```html
 <audio>
-  <source src="https://example.com/my-audio.mp3" type="audio/mp3">
+  <source src="https://example.com/my-audio.mp3" type="audio/mpeg">
 </audio>
 ```
 

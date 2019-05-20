@@ -5,10 +5,9 @@
 // The 'parent' argument passed in is the parent object from Player.js.
 // This script is only intended to be used with that Player.js.
 var Playlist = function(parent) {
-  var $;
   this.player = parent;
   // The containing DOM element
-  this.$el = this.player.$playlistElement;
+  this.el = this.player.playlistEl;
 };
 
 // -----------------------------
@@ -22,30 +21,33 @@ Playlist.prototype.init = function() {
 };
 
 Playlist.prototype.selectElements = function() {
-  this.$items = this.$el.find('.js-playlist-item');
+  this.itemEls = this.el.querySelectorAll('.js-playlist-item');
 
   return this;
 };
 
 Playlist.prototype.setNextItem = function() {
-  this.$items.each(function() {
-    var $currentItem = $(this);
-    var $nextItem = $(this).next();
+  Array.prototype.forEach.call(this.itemEls, function(currentItemEl) {
+    var nextItemEl = currentItemEl.nextElementSibling;
     var nextSrc;
 
-    if ($nextItem.length === 0) {
+    if (!nextItemEl) {
       return;
     }
 
-    nextSrc = $nextItem.data('src');
-    $currentItem.attr('data-next', nextSrc);
+    nextSrc = nextItemEl.getAttribute('data-src');
+    currentItemEl.setAttribute('data-next', nextSrc);
   });
 
   return this;
 };
 
 Playlist.prototype.bindEventHandlers = function() {
-  this.$items.on('click', this.onItemClick.bind(this));
+  var self = this;
+
+  Array.prototype.forEach.call(this.itemEls, function(el) {
+    el.addEventListener('click', self.onItemClick.bind(self));
+  });
 
   return this;
 };
@@ -56,15 +58,16 @@ Playlist.prototype.bindEventHandlers = function() {
 
 Playlist.prototype.onItemClick = function(e) {
   e.preventDefault();
-  var $target = $(e.currentTarget);
-  var src = $target.data('src');
-  var title = $target.data('title');
-  var artist = $target.data('artist');
+  var targetEl = e.currentTarget;
+  var src = targetEl.getAttribute('data-src');
+  var title = targetEl.getAttribute('data-title');
+  var artist = targetEl.getAttribute('data-artist');
 
-  this.player.loadAudioFromSrc(src);
+  this.player.el.setAttribute('data-src', src);
+  this.player.loadAudioFromSources(src);
   this.player.playAudio();
-  this.displayPlayedState($target);
-  this.displayBufferingState($target);
+  this.displayPlayedState(targetEl);
+  this.displayBufferingState(targetEl);
   this.populatePlayerInfo(title, artist);
 };
 
@@ -72,42 +75,46 @@ Playlist.prototype.onItemClick = function(e) {
 // Helpers
 // -----------------------------
 
-Playlist.prototype.displayPlayedState = function($item) {
+Playlist.prototype.displayPlayedState = function(el) {
   this.removeDisplayStates();
-  $item.addClass('is-playing');
+  el.classList.add('is-playing');
 };
 
-Playlist.prototype.displayPlayingState = function($item) {
-  this.removeBufferingState($item);
-  this.removePausedState($item);
+Playlist.prototype.displayPlayingState = function(el) {
+  this.removeBufferingState(el);
+  this.removePausedState(el);
 };
 
-Playlist.prototype.displayPausedState = function($item) {
-  $item.addClass('is-paused');
+Playlist.prototype.displayPausedState = function(el) {
+  el.classList.add('is-paused');
 };
 
-Playlist.prototype.removePausedState = function($item) {
-  $item.removeClass('is-paused');
+Playlist.prototype.removePausedState = function(el) {
+  el.classList.remove('is-paused');
 };
 
-Playlist.prototype.displayBufferingState = function($item) {
-  $item.addClass('is-loading');
+Playlist.prototype.displayBufferingState = function(el) {
+  el.classList.add('is-loading');
 };
 
-Playlist.prototype.removeBufferingState = function($item) {
-  $item.removeClass('is-loading');
+Playlist.prototype.removeBufferingState = function(el) {
+  el.classList.remove('is-loading');
 };
 
 Playlist.prototype.removeDisplayStates = function() {
-  this.removeBufferingState(this.$items);
-  this.$items.removeClass('is-active');
-  this.$items.removeClass('is-paused');
-  this.$items.removeClass('is-playing');
+  var self = this;
+
+  Array.prototype.forEach.call(this.itemEls, function(el) {
+    self.removeBufferingState(el);
+    self.removePausedState(el);
+    el.classList.remove('is-playing');
+    el.classList.remove('is-active');
+  });
 };
 
 Playlist.prototype.populatePlayerInfo = function(title, artist) {
-  this.player.$title.text(title);
-  this.player.$artist.text(artist);
+  this.player.titleEl.textContent = title;
+  this.player.artistEl.textContent = artist;
 };
 
 export default Playlist;

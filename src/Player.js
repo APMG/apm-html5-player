@@ -1,4 +1,5 @@
 import { toFormatted } from './FormatTime';
+import Playlist from './Playlist';
 // import Playlist from './Playlist';
 
 // Constants
@@ -37,8 +38,7 @@ var Player = function(el, options) {
 // Initialize the module
 Player.prototype.init = function() {
   this.selectElements()
-    // TODO split out playlist
-    // .initPlaylist()
+    .initPlaylist()
     .getSources()
     .bindEventHandlers()
     .initTime()
@@ -68,9 +68,8 @@ Player.prototype.selectElements = function() {
   // Info
   this.durationEl = this.el.querySelector('.js-player-duration');
   this.currentTimeEl = this.el.querySelector('.js-player-currentTime');
-  // TODO: split out playlist
-  // this.titleEl = this.el.querySelector('.js-player-title');
-  // this.artistEl = this.el.querySelector('.js-player-artist');
+  this.titleEl = this.el.querySelector('.js-player-title');
+  this.artistEl = this.el.querySelector('.js-player-artist');
 
   return this;
 };
@@ -84,8 +83,11 @@ Player.prototype.getSources = function() {
     );
   } catch (e) {
     if (typeof console !== 'undefined') {
-      // eslint-disable-next-line
-      console.log(e);
+      // If the error is anything other than not evaluating to JSON, print to console
+      if (!/^\s*SyntaxError: Unexpected token/.test(e)) {
+        // eslint-disable-next-line
+        console.log(e);
+      }
     }
 
     this.sources = this.el.getAttribute('data-src');
@@ -151,16 +153,15 @@ Player.prototype.initTime = function() {
   return this;
 };
 
-// TODO: split out playlist
-// Player.prototype.initPlaylist = function() {
-//   if (this.playlistEl.length) {
-//     this.playlist = new Playlist(this);
-//     this.playlist.init();
-//     this.hasPlaylist = true;
-//   }
+Player.prototype.initPlaylist = function() {
+  if (this.playlistEl) {
+    this.playlist = new Playlist(this);
+    this.playlist.init();
+    this.hasPlaylist = true;
+  }
 
-//   return this;
-// };
+  return this;
+};
 
 // -----------------------------
 // Event Handlers
@@ -284,10 +285,9 @@ Player.prototype.onAudioPlaying = function() {
 // finished for the current file
 Player.prototype.onAudioEnded = function() {
   this.displayStoppedState();
-  // TODO: split out playlist
-  // if (this.hasPlaylist === true) {
-  //   this.playNext();
-  // }
+  if (this.hasPlaylist === true) {
+    this.playNext();
+  }
 };
 
 // HTMLMediaElement 'volumechange' event fires when the audio's
@@ -322,7 +322,7 @@ Player.prototype.loadAudioFromSources = function(sources) {
 
   if (typeof sources === 'string') {
     // Turn a string value into an array with one item
-    // This is in this function so that loadAudioFromSrc()
+    // This is in this function so that loadAudioFromSources()
     // can be called externally with a string if needed
     sources = sources.split();
   }
@@ -351,7 +351,10 @@ Player.prototype.createSourceEls = function(sources) {
     // Generate the html
     var sourceEl = document.createElement('source');
     sourceEl.setAttribute('src', sourceUrl);
-    sourceEl.setAttribute('type', sourceType);
+    // Only set a type if sourceType is not null
+    if (sourceType !== null) {
+      sourceEl.setAttribute('type', sourceType);
+    }
     self.audioEl.appendChild(sourceEl);
   });
 };
@@ -359,13 +362,24 @@ Player.prototype.createSourceEls = function(sources) {
 Player.prototype.getSourceType = function(source) {
   // We don't test for only the end of the filename in case
   // there is a cache busting string on the end
-  var aacReg = /(\.aac)/;
-  var mp3Reg = /(\.mp3)/;
+  var aacReg = /\.aac/;
+  var mp4Reg = /\.mp4/;
+  var m4aReg = /\.m4a/;
+  var oggReg = /\.ogg|\.oga/;
+  var mp3Reg = /\.mp3/;
 
   if (aacReg.test(source)) {
+    return 'audio/aac';
+  } else if (mp4Reg.test(source)) {
     return 'audio/mp4';
+  } else if (oggReg.test(source)) {
+    return 'audio/ogg';
+  } else if (m4aReg.test(source)) {
+    return 'audio/m4a';
   } else if (mp3Reg.test(source)) {
-    return 'audio/mp3';
+    return 'audio/mpeg';
+  } else {
+    return null;
   }
 };
 
@@ -407,24 +421,26 @@ Player.prototype.pauseAllAudio = function() {
   });
 };
 
-// TODO: Split out playlist
-// Player.prototype.playNext = function() {
-//   var nextSrc = this.getNextPlaylistSrc();
-//   var nextItemEl;
+Player.prototype.playNext = function() {
+  var nextSrc = this.getNextPlaylistSrc();
 
-//   if (typeof nextSrc === 'undefined') return;
-//   nextItemEl = this.findNext(nextSrc);
-//   this.playlist.populatePlayerInfo(
-//     nextItemEl.getAttribute('data-title'),
-//     nextItemEl.getAttribute('data-artist')
-//   );
-//   this.loadAudioFromSrc(nextSrc);
-//   this.playAudio();
-// };
+  var nextItemEl;
 
-// Player.prototype.findNext = function(src) {
-//   return this.playlistEl.querySelector("li[data-src='" + src + "']");
-// };
+  if (typeof nextSrc === 'undefined' || nextSrc === null) return;
+
+  this.el.setAttribute('data-src', nextSrc);
+  nextItemEl = this.findNext(nextSrc);
+  this.playlist.populatePlayerInfo(
+    nextItemEl.getAttribute('data-title'),
+    nextItemEl.getAttribute('data-artist')
+  );
+  this.loadAudioFromSources(nextSrc);
+  this.playAudio();
+};
+
+Player.prototype.findNext = function(src) {
+  return this.playlistEl.querySelector('li[data-src="' + src + '"]');
+};
 
 Player.prototype.getSecondsByClickPosition = function(element, clickXPosition) {
   var timelineRect = element.getBoundingClientRect();
@@ -479,21 +495,19 @@ Player.prototype.getVolumeByVertClickPosition = function(
   return volume;
 };
 
-// TODO: Should probably move all playlist stuff out of here
-//
-// Player.prototype.getPlaylistItem = function() {
-//   var $item = this.playlist.items.filter(
-//     $('[data-src="' + $(this.audio).attr('src') + '"]')
-//   );
-//   return $item;
-// };
+Player.prototype.getCurrentPlaylistItem = function() {
+  var srcString = this.el.getAttribute('data-src');
+  var items = Array.prototype.filter.call(this.playlist.itemEls, function(el) {
+    return el.matches('[data-src="' + srcString + '"]');
+  });
+  var itemEl = items[0];
+  return itemEl;
+};
 
-// Player.prototype.getNextPlaylistSrc = function() {
-//   var $item = this.playlist.$items.filter(
-//     $('[data-src="' + $(this.audio).attr('src') + '"]')
-//   );
-//   return $item.data('next');
-// };
+Player.prototype.getNextPlaylistSrc = function() {
+  var itemEl = this.getCurrentPlaylistItem();
+  return itemEl.getAttribute('data-next');
+};
 
 Player.prototype.changeVolume = function(volume) {
   this.audioEl.volume = volume;
@@ -590,10 +604,9 @@ Player.prototype.displayPlayedState = function() {
   this.el.classList.remove(PAUSED_CLASS);
   this.el.classList.add(PLAYING_CLASS);
 
-  // TODO split out playlist
-  // if (this.hasPlaylist === true) {
-  //   this.playlist.displayPlayedState(this.getPlaylistItem());
-  // }
+  if (this.hasPlaylist === true) {
+    this.playlist.displayPlayedState(this.getCurrentPlaylistItem());
+  }
 };
 
 // Modifies the play/pause button state
@@ -601,20 +614,18 @@ Player.prototype.displayPausedState = function() {
   this.el.classList.remove(PLAYING_CLASS);
   this.el.classList.add(PAUSED_CLASS);
 
-  // TODO split out playlist
-  // if (this.hasPlaylist === true) {
-  //   this.playlist.displayPausedState(this.getPlaylistItem());
-  // }
+  if (this.hasPlaylist === true) {
+    this.playlist.displayPausedState(this.getCurrentPlaylistItem());
+  }
 };
 
 // Modifies the timeline
 Player.prototype.displayPlayingState = function() {
   this.removeBufferingState();
 
-  // TODO split out playlist
-  // if (this.hasPlaylist === true) {
-  //   this.playlist.displayPlayingState(this.getPlaylistItem());
-  // }
+  if (this.hasPlaylist === true) {
+    this.playlist.displayPlayingState(this.getCurrentPlaylistItem());
+  }
 };
 
 // Modifies the timeline, button displays paused state
@@ -623,30 +634,27 @@ Player.prototype.displayStoppedState = function() {
   this.el.classList.remove(PAUSED_CLASS);
   this.removeBufferingState();
 
-  // TODO split out playlist
-  // if (this.hasPlaylist === true) {
-  //   this.playlist.removeDisplayStates();
-  // }
+  if (this.hasPlaylist === true) {
+    this.playlist.removeDisplayStates();
+  }
 };
 
 // Adds buffering styles to timeline
 Player.prototype.displayBufferingState = function() {
   this.el.classList.add(LOADING_CLASS);
 
-  // TODO split out playlist
-  // if (this.hasPlaylist === true) {
-  //   this.playlist.displayBufferingState(this.getPlaylistItem());
-  // }
+  if (this.hasPlaylist === true) {
+    this.playlist.displayBufferingState(this.getCurrentPlaylistItem());
+  }
 };
 
 // Removes buffering styles from timeline
 Player.prototype.removeBufferingState = function() {
   this.el.classList.remove(LOADING_CLASS);
 
-  // TODO split out playlist
-  // if (this.hasPlaylist === true) {
-  //   this.playlist.removeBufferingState(this.getPlaylistItem());
-  // }
+  if (this.hasPlaylist === true) {
+    this.playlist.removeBufferingState(this.getCurrentPlaylistItem());
+  }
 };
 
 Player.prototype.displayCurrentVolume = function() {
