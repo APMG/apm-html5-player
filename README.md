@@ -36,6 +36,7 @@ The library was designed for backwards compatibility with older javascript build
 - [JS Setup](#js-setup)
   - [ES6/Require.js Setup](#es6requirejs-setup)
   - [Global Setup](#global-setup)
+- [Playlists](#playlists)
 
 [Development Setup](#development-setup)
 
@@ -181,15 +182,15 @@ At a minimum, the library needs a containing element and an `<audio>` element in
 
 Other DOM elements used by the library are selected by the following classes:
 
-- `js-player-play`: The play/pause button. To change state of the button (to alternate between a play and pause icon), you can put the appropriate icons inside the button and show/hide based on the CSS state class applied to `js-player`
-- `js-player-timeline`: The outer container of the scrubber
-- `js-player-progress`: The element indicating the time elapsed inside the scrubber. Must be contained inside `js-player-timeline`
-- `js-player-buffered`: The element indicating the loaded audio buffers. Must be contained inside `js-player-timeline` and should not contain any elements (or they will be overwritten)
-- `js-player-volume`: The outer container of the volume bar
-- `js-player-volume-current`: The element indicating the current volume. Must be contained inside `js-player-volume`
-- `js-player-mute`: The audio mute button. To change state of the button (to alternate between a mute and unmute icon), you can put the appropriate icons inside the button and show/hide based on the CSS state class applied to `js-player`
-- `js-player-duration`: Displays the total length (in hh:mm:ss) of the audio which is currently loaded
-- `js-player-currentTime`: Displays the current time of the currently loaded audio
+- `js-player-play`: The play/pause button. To change state of the button (to alternate between a play and pause icon), you can put the appropriate icons inside the button and show/hide based on the CSS state class applied to `js-player`. Can be multiple elements.
+- `js-player-timeline`: The outer container of the scrubber. Must be a single element.
+- `js-player-progress`: The element indicating the time elapsed inside the scrubber. Must be contained inside `js-player-timeline`. Must be a single element.
+- `js-player-buffered`: The element indicating the loaded audio buffers. Must be contained inside `js-player-timeline` and should not contain any elements (or they will be overwritten). Must be a single element.
+- `js-player-volume`: The outer container of the volume bar. Must be a single element.
+- `js-player-volume-current`: The element indicating the current volume. Must be contained inside `js-player-volume`. Must be a single element.
+- `js-player-mute`: The audio mute button. To change state of the button (to alternate between a mute and unmute icon), you can put the appropriate icons inside the button and show/hide based on the CSS state class applied to `js-player`. Must be a single element.
+- `js-player-duration`: Displays the total length (in hh:mm:ss) of the audio which is currently loaded. Must be a single element.
+- `js-player-currentTime`: Displays the current time of the currently loaded audio. Must be a single element.
 
 #### DOM Example
 
@@ -392,6 +393,12 @@ var player = new window.ApmPlayer.Player(playerElement);
 // initialize the player
 player.init();
 ```
+
+### Playlists
+
+This library includes functionality for managing a playlist in the DOM (included for backwards compatibility with some of our sites), but it's not recommended to use it for new projects.
+The behavior isn't well-tested and stores its data in the DOM instead of in memory, meaning it is relatively brittle.
+At this time it is recommended to write your own custom implementation to manage playlists if you need them.
 
 ## Development setup
 
