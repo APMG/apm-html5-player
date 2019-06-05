@@ -472,7 +472,7 @@ Player.prototype.getVolumeByHorizClickPosition = function(
   clickXPosition
 ) {
   var volumeBarRect = element.getBoundingClientRect();
-  var volumeBarOffset = volumeBarRect.left;
+  var volumeBarOffset = volumeBarRect.left + window.pageXOffset;
   var volumeBarWidth = element.offsetWidth;
   var positionInElement = clickXPosition - volumeBarOffset;
   var percent = positionInElement / volumeBarWidth;
@@ -486,7 +486,7 @@ Player.prototype.getVolumeByVertClickPosition = function(
   clickYPosition
 ) {
   var volumeBarRect = element.getBoundingClientRect();
-  var volumeBarOffset = volumeBarRect.top + document.scrollTop;
+  var volumeBarOffset = volumeBarRect.top + window.pageYOffset;
   var volumeBarHeight = element.offsetHeight;
   var positionInElement = clickYPosition - volumeBarOffset;
   var positionFromBottom = volumeBarHeight - positionInElement;
