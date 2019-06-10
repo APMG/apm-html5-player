@@ -22,14 +22,14 @@ function HTML5PlayerGoogleAnalytics(args) {
   this.quartile = 0;
 
   function checkSources() {
-    self.isFirstPlay = self.audioele.src === self.lastsrc ? false : true;
-    self.lastsrc = self.audioele.src;
+    self.isFirstPlay = self.audioele.currentSrc === self.lastsrc ? false : true;
+    self.lastsrc = self.audioele.currentSrc;
   }
 
   /* Return category 'Live Audio', 'On-Demand Audio' or in rare instances 'Underwriting' */
   function getCategory() {
     var cat;
-    if (self.audioele.src.indexOf('stream.publicradio.org') > -1) {
+    if (self.audioele.currentSrc.indexOf('stream.publicradio.org') > -1) {
       cat = 'Live Audio';
     } else {
       cat = 'On-Demand Audio';
@@ -38,7 +38,7 @@ function HTML5PlayerGoogleAnalytics(args) {
   }
 
   function audioSrcForReporting() {
-    return self.audioele.src.replace(
+    return self.audioele.currentSrc.replace(
       'http://play.publicradio.org/api-2.0.1/o',
       ''
     );
