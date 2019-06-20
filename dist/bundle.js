@@ -327,7 +327,12 @@
 
   Player.prototype.onPlayClick = function(e) {
     e.preventDefault();
+    this.handlePlay();
+  };
 
+  // handler is separated from actual click event so it can be called
+  // externally (e.g. from play buttons outside of the player interface)
+  Player.prototype.handlePlay = function() {
     if (this.isPlaying === false) {
       if (this.audioEl.readyState === 0) {
         // get sources from data attribute in case it changed
