@@ -259,21 +259,21 @@ Assume a JSON object that looks like this:
 [
   {
     "url": "https://example.com/my-audio.aac",
-    "type": "audio/mp4"
+    "type": "audio/aac"
   },
   {
     "url": "https://example.com/my-audio.mp3",
-    "type": "audio/mp3"
+    "type": "audio/mpeg"
   }
 ]
 ```
 
-This provides a file in the AAC codec, which should use the `audio/mp4` file container type as the preferred format, and the browser will fall back to the MP3 file (type `audio/mp3`) if it can't play AAC audio.
+This provides a file in the AAC codec, which should use the `audio/aac` file container type as the preferred format, and the browser will fall back to the MP3 file (type `audio/mpeg`) if it can't play AAC audio.
 
 To apply this to the DOM it should look like this. The JSON can use single quotes here instead of double quotes if preferred:
 
 ```html
-<div class="js-player" data-src="[{'url': 'https://example.com/my-audio.aac', 'type': 'audio/mp4'}, {'url': 'https://example.com/my-audio.mp3', 'type': 'audio/mp3'}]">
+<div class="js-player" data-src="[{'url': 'https://example.com/my-audio.aac', 'type': 'audio/aac'}, {'url': 'https://example.com/my-audio.mp3', 'type': 'audio/mpeg'}]">
   <audio></audio>
 </div>
 ```
@@ -282,7 +282,7 @@ For reference, once this is parsed by the library after playback has been initia
 
 ```html
 <audio>
-  <source src="https://example.com/my-audio.aac" type="audio/mp4">
+  <source src="https://example.com/my-audio.aac" type="audio/aac">
   <source src="https://example.com/my-audio.mp3" type="audio/mpeg">
 </audio>
 ```
@@ -301,7 +301,7 @@ Resulting in:
 
 ```html
 <audio>
-  <source src="https://example.com/my-audio.aac" type="audio/mp4">
+  <source src="https://example.com/my-audio.aac" type="audio/aac">
   <source src="https://example.com/my-audio.ogg" type="audio/ogg">
   <source src="https://example.com/my-audio.mp3" type="audio/mpeg">
 </audio>
