@@ -1,29 +1,32 @@
 {
   "name": "apm-html5-player",
-  "version": "0.2.2",
+  "version": "1.0.0-rc.2",
   "authors": [
     "Matt Aho <maho@mpr.org>",
     "Geoffrey Hankerson <ghankerson@mpr.org>"
   ],
   "description": "Javascript library for APM html5 audio players",
   "main": "script/Player.js",
-  "moduleType": [
-    "amd",
-    "globals"
-  ],
+  "moduleType": ["amd", "globals"],
   "license": "MIT",
-  "homepage": "https://gitlab.mpr.org/js-libraries/apm-html5-player",
+  "homepage": "https://github.com/APMG/apm-html5-player.git",
   "private": true,
   "repository": {
     "type": "git",
-    "url": "git@gitlab.mpr.org:js-libraries/apm-html5-player.git"
+    "url": "https://github.com/APMG/apm-html5-player.git"
   },
   "ignore": [
     "**/.*",
     "node_modules",
     "bower_components",
     "demos",
+    "jest.config.js",
+    "package.json",
+    "package-lock.json",
+    "rollup.config.js",
+    "src",
     "test",
-    "tests"
+    "tests",
+    "yarn.lock"
   ]
 }

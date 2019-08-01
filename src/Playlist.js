@@ -1,123 +1,120 @@
-(function() {
-  // Required modules for page load
-  'use strict';
+// Required modules for page load
+'use strict';
 
+// Constructor
+// The 'parent' argument passed in is the parent object from Player.js.
+// This script is only intended to be used with that Player.js.
+var Playlist = function(parent) {
+  this.player = parent;
+  // The containing DOM element
+  this.el = this.player.playlistEl;
+};
 
-    // Constructor
-  // The 'parent' argument passed in is the parent object from Player.js.
-  // This script is only intended to be used with that Player.js.
-  var Playlist = function(parent) {
-    var $;
-    this.player = parent;
-    // The containing DOM element
-    this.$el = this.player.$playlistElement;
-  };
+// -----------------------------
+// Setup functions
+// -----------------------------
 
-  // -----------------------------
-  // Setup functions
-  // -----------------------------
-
-  Playlist.prototype.init = function() {
-    this.selectElements()
+Playlist.prototype.init = function() {
+  this.selectElements()
     .setNextItem()
     .bindEventHandlers();
-  };
+};
 
-  Playlist.prototype.selectElements = function() {
-    this.$items = this.$el.find('.js-playlist-item');
+Playlist.prototype.selectElements = function() {
+  this.itemEls = this.el.querySelectorAll('.js-playlist-item');
 
-    return this;
-  };
+  return this;
+};
 
-  Playlist.prototype.setNextItem = function() {
-    this.$items.each(function() {
-      var $currentItem = $(this);
-      var $nextItem = $(this).next();
-      var nextSrc;
+Playlist.prototype.setNextItem = function() {
+  Array.prototype.forEach.call(this.itemEls, function(currentItemEl) {
+    var nextItemEl = currentItemEl.nextElementSibling;
+    var nextSrc;
 
-      if ($nextItem.length === 0) { return; }
+    if (!nextItemEl) {
+      return;
+    }
 
-      nextSrc = $nextItem.data('src');
-      $currentItem.attr('data-next', nextSrc);
-    });
+    nextSrc = nextItemEl.getAttribute('data-src');
+    currentItemEl.setAttribute('data-next', nextSrc);
+  });
 
-    return this;
-  };
+  return this;
+};
 
-  Playlist.prototype.bindEventHandlers = function() {
-    this.$items.on('click', this.onItemClick.bind(this));
+Playlist.prototype.bindEventHandlers = function() {
+  var self = this;
 
-    return this;
-  };
+  Array.prototype.forEach.call(this.itemEls, function(el) {
+    el.addEventListener('click', self.onItemClick.bind(self));
+  });
 
-  // -----------------------------
-  // Event Handlers
-  // -----------------------------
+  return this;
+};
 
-  Playlist.prototype.onItemClick = function(e) {
-    e.preventDefault();
-    var $target = $(e.currentTarget);
-    var src = $target.data('src');
-    var title = $target.data('title');
-    var artist = $target.data('artist');
+// -----------------------------
+// Event Handlers
+// -----------------------------
 
-    this.player.loadAudioFromSrc(src);
-    this.player.playAudio();
-    this.displayPlayedState($target);
-    this.displayBufferingState($target);
-    this.populatePlayerInfo(title, artist);
-  };
+Playlist.prototype.onItemClick = function(e) {
+  e.preventDefault();
+  var targetEl = e.currentTarget;
+  var src = targetEl.getAttribute('data-src');
+  var title = targetEl.getAttribute('data-title');
+  var artist = targetEl.getAttribute('data-artist');
 
-  // -----------------------------
-  // Helpers
-  // -----------------------------
+  this.player.el.setAttribute('data-src', src);
+  this.player.loadAudioFromSources(src);
+  this.player.playAudio();
+  this.displayPlayedState(targetEl);
+  this.displayBufferingState(targetEl);
+  this.populatePlayerInfo(title, artist);
+};
 
-  Playlist.prototype.displayPlayedState = function($item) {
-    this.removeDisplayStates();
-    $item.addClass('is-playing');
-  };
+// -----------------------------
+// Helpers
+// -----------------------------
 
-  Playlist.prototype.displayPlayingState = function($item) {
-    this.removeBufferingState($item);
-    this.removePausedState($item);
-  };
+Playlist.prototype.displayPlayedState = function(el) {
+  this.removeDisplayStates();
+  el.classList.add('is-playing');
+};
 
-  Playlist.prototype.displayPausedState = function($item) {
-    $item.addClass('is-paused');
-  };
+Playlist.prototype.displayPlayingState = function(el) {
+  this.removeBufferingState(el);
+  this.removePausedState(el);
+};
 
-  Playlist.prototype.removePausedState = function($item) {
-    $item.removeClass('is-paused');
-  };
+Playlist.prototype.displayPausedState = function(el) {
+  el.classList.add('is-paused');
+};
 
-  Playlist.prototype.displayBufferingState = function($item) {
-    $item.addClass('is-loading');
-  };
+Playlist.prototype.removePausedState = function(el) {
+  el.classList.remove('is-paused');
+};
 
-  Playlist.prototype.removeBufferingState = function($item) {
-    $item.removeClass('is-loading');
-  };
+Playlist.prototype.displayBufferingState = function(el) {
+  el.classList.add('is-loading');
+};
 
-  Playlist.prototype.removeDisplayStates = function() {
-    this.removeBufferingState(this.$items);
-    this.$items.removeClass('is-active');
-    this.$items.removeClass('is-paused');
-    this.$items.removeClass('is-playing');
-  };
+Playlist.prototype.removeBufferingState = function(el) {
+  el.classList.remove('is-loading');
+};
 
-  Playlist.prototype.populatePlayerInfo = function(title, artist) {
-    this.player.$title.text(title);
-    this.player.$artist.text(artist);
-  };
+Playlist.prototype.removeDisplayStates = function() {
+  var self = this;
 
-  // Support Require.js
-  if ( typeof define === "function" && define.amd ) {
-    define(function() {
-      return Playlist;
-    });
-  }
-  else {
-    window.Playlist = Playlist;
-  }
+  Array.prototype.forEach.call(this.itemEls, function(el) {
+    self.removeBufferingState(el);
+    self.removePausedState(el);
+    el.classList.remove('is-playing');
+    el.classList.remove('is-active');
+  });
+};
 
-})();
+Playlist.prototype.populatePlayerInfo = function(title, artist) {
+  this.player.titleEl.textContent = title;
+  this.player.artistEl.textContent = artist;
+};
+
+export default Playlist;
