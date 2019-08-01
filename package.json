@@ -28,7 +28,7 @@
     "test:watch": "jest --watch"
   },
   "title": "APM HTML5 Player",
-  "version": "1.0.0-rc.2",
+  "version": "1.0.0",
   "devDependencies": {
     "@babel/cli": "^7.4.4",
     "@babel/core": "^7.4.4",
