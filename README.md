@@ -292,7 +292,7 @@ For reference, once this is parsed by the library after playback has been initia
 If your data source that provides the audio urls doesn't provide information about the codec, you can just pass an array of url strings and the library will try to figure out the MIME types based on the filename:
 
 ```html
-<div class="js-player" data-src="['https://example.com/my-audio.aac', 'https://example.com/my-audio.aac', 'https://example.com/my-audio.mp3']">
+<div class="js-player" data-src="['https://example.com/my-audio.aac', 'https://example.com/my-audio.ogg', 'https://example.com/my-audio.mp3']">
   <audio></audio>
 </div>
 ```
@@ -372,7 +372,7 @@ Assuming you imported or required the player using the existing exported name `P
 // your custom js file
 
 // The DOM element container
-const playerElement = document.querySelector('js-player');
+const playerElement = document.querySelector('.js-player');
 // Create new instance of the Player class
 const player = new Player(playerElement);
 
@@ -387,7 +387,7 @@ If you included the player library in your project in a `<script>` tag, the name
 ```javascript
 // your custom js file
 
-var playerElement = document.querySelector('js-player');
+var playerElement = document.querySelector('.js-player');
 var player = new window.ApmPlayer.Player(playerElement);
 
 // initialize the player
