@@ -405,6 +405,8 @@ At this time it is recommended to write your own custom implementation to manage
 We use [rollup.js](https://rollupjs.org) to build the javascript bundle and allows us to use `import` and `export`.
 For easier backwards compatibility, this library doesn't use ES6 features other than import/export, and all javascript should be written in ES5 for the time being.
 
+To get started, just clone this repo and then from the project directory run `npm install` or `yarn`. Then you can do the following:
+
 ### Linting
 
 This project uses [eslint](https://eslint.org) and [prettier](https://prettier.io) for linting. Eslint catches various errors and anti-patterns in your code, while prettier checks and fixes formatting such as tabs/spaces, line length, etc.
@@ -418,7 +420,7 @@ It is encouraged to have the linters run automatically in your code editor and/o
 ### Running a build
 
 To build the library, run `npm run build` and it will update the `bundle.js` file in the `dist` directory.
-The dist directory is included in
+The dist directory is included in the repo so that the library can be used with Bower or without npm/yarn.
 
 ### Testing
 
