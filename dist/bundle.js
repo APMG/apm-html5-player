@@ -114,7 +114,7 @@
   var PAUSED_CLASS = 'is-paused';
   var LOADING_CLASS = 'is-loading';
   var MUTED_CLASS = 'is-muted';
-  var Player = function(el, options) {
+  var Player = function (el, options) {
     this.el = el;
     this.options = options;
     this.isPlaying = false;
@@ -124,7 +124,7 @@
     this.playlist;
     this.hasPlaylist = false;
   };
-  Player.prototype.init = function() {
+  Player.prototype.init = function () {
     this.selectElements()
       .initPlaylist()
       .getSources()
@@ -133,7 +133,7 @@
       .displayCurrentVolume();
     return this;
   };
-  Player.prototype.selectElements = function() {
+  Player.prototype.selectElements = function () {
     this.audioEl = this.el.querySelector('audio');
     this.playButtonEls = this.el.querySelectorAll('.js-player-play');
     this.skipForwardButtonEl = this.el.querySelector('[data-skip-forward]');
@@ -154,7 +154,7 @@
     this.artistEl = this.el.querySelector('.js-player-artist');
     return this;
   };
-  Player.prototype.getSources = function() {
+  Player.prototype.getSources = function () {
     try {
       this.sources = JSON.parse(
         decodeURI(this.el.getAttribute('data-src')).replace(/'/g, '"')
@@ -170,9 +170,9 @@
     }
     return this;
   };
-  Player.prototype.bindEventHandlers = function() {
+  Player.prototype.bindEventHandlers = function () {
     var self = this;
-    Array.prototype.forEach.call(this.playButtonEls, function(el) {
+    Array.prototype.forEach.call(this.playButtonEls, function (el) {
       el.addEventListener('click', self.onPlayClick.bind(self));
     });
     this.skipForwardButtonEl &&
@@ -208,11 +208,11 @@
     this.audioEl.addEventListener('progress', this.onProgress.bind(this));
     return this;
   };
-  Player.prototype.initTime = function() {
+  Player.prototype.initTime = function () {
     this.displayCurrentTime();
     return this;
   };
-  Player.prototype.initPlaylist = function() {
+  Player.prototype.initPlaylist = function () {
     if (this.playlistEl) {
       this.playlist = new Playlist(this);
       this.playlist.init();
@@ -220,11 +220,11 @@
     }
     return this;
   };
-  Player.prototype.onPlayClick = function(e) {
+  Player.prototype.onPlayClick = function (e) {
     e.preventDefault();
     this.handlePlay();
   };
-  Player.prototype.handlePlay = function() {
+  Player.prototype.handlePlay = function () {
     if (this.isPlaying === false) {
       if (this.audioEl.readyState === 0) {
         this.getSources();
@@ -238,7 +238,7 @@
       }
     }
   };
-  Player.prototype.onSkipForwardClick = function(e) {
+  Player.prototype.onSkipForwardClick = function (e) {
     var targetEl = e.currentTarget;
     var seconds = targetEl.getAttribute('data-skip-forward');
     e.preventDefault();
@@ -247,7 +247,7 @@
     }
     this.skipForward(seconds);
   };
-  Player.prototype.onSkipBackClick = function(e) {
+  Player.prototype.onSkipBackClick = function (e) {
     var targetEl = e.currentTarget;
     var seconds = targetEl.getAttribute('data-skip-back');
     e.preventDefault();
@@ -256,14 +256,14 @@
     }
     this.skipBack(seconds);
   };
-  Player.prototype.onTimelineClick = function(e) {
+  Player.prototype.onTimelineClick = function (e) {
     var targetEl = e.currentTarget;
     var clickXPosition = e.pageX;
     var seconds = this.getSecondsByClickPosition(targetEl, clickXPosition);
     e.preventDefault(e);
     this.seekTime(seconds);
   };
-  Player.prototype.onVolumeClick = function(e) {
+  Player.prototype.onVolumeClick = function (e) {
     var targetEl = e.currentTarget;
     var volume;
     if (targetEl.getAttribute('data-volume-direction') === 'h') {
@@ -276,7 +276,7 @@
     e.preventDefault();
     this.changeVolume(volume);
   };
-  Player.prototype.onMuteClick = function(e) {
+  Player.prototype.onMuteClick = function (e) {
     e.preventDefault();
     if (this.audioEl.volume !== 0) {
       this.muteAudio();
@@ -284,41 +284,41 @@
       this.unmuteAudio();
     }
   };
-  Player.prototype.onAudioPlay = function() {
+  Player.prototype.onAudioPlay = function () {
     this.isPlaying = true;
     this.displayPlayedState();
   };
-  Player.prototype.onAudioPause = function() {
+  Player.prototype.onAudioPause = function () {
     this.isPlaying = false;
     this.displayPausedState();
   };
-  Player.prototype.onAudioTimeupdate = function() {
+  Player.prototype.onAudioTimeupdate = function () {
     this.displayCurrentTime();
     this.sendToNielsen('setPlayheadPosition', Date.now() / 1000);
   };
-  Player.prototype.onAudioWaiting = function() {
+  Player.prototype.onAudioWaiting = function () {
     this.displayBufferingState();
   };
-  Player.prototype.onAudioPlaying = function() {
+  Player.prototype.onAudioPlaying = function () {
     this.displayPlayingState();
   };
-  Player.prototype.onAudioEnded = function() {
+  Player.prototype.onAudioEnded = function () {
     this.displayStoppedState();
     if (this.hasPlaylist === true) {
       this.playNext();
     }
   };
-  Player.prototype.onVolumeChange = function() {
+  Player.prototype.onVolumeChange = function () {
     this.displayCurrentVolume();
   };
-  Player.prototype.onLoadedMetadata = function() {
+  Player.prototype.onLoadedMetadata = function () {
     this.displayDuration();
     this.sendToNielsen('loadMetadata', window.nielsenMetadataObject);
   };
-  Player.prototype.onProgress = function() {
+  Player.prototype.onProgress = function () {
     this.displayTimeRanges();
   };
-  Player.prototype.loadAudioFromSources = function(sources) {
+  Player.prototype.loadAudioFromSources = function (sources) {
     this.audioEl.removeAttribute('src');
     this.audioEl.innerHTML = '';
     if (typeof sources === 'string') {
@@ -327,9 +327,9 @@
     this.createSourceEls(sources);
     this.audioEl.load();
   };
-  Player.prototype.createSourceEls = function(sources) {
+  Player.prototype.createSourceEls = function (sources) {
     var self = this;
-    sources.forEach(function(source) {
+    sources.forEach(function (source) {
       var sourceUrl;
       var sourceType;
       if (typeof source === 'object' && !Array.isArray(source)) {
@@ -347,7 +347,7 @@
       self.audioEl.appendChild(sourceEl);
     });
   };
-  Player.prototype.getSourceType = function(source) {
+  Player.prototype.getSourceType = function (source) {
     var aacReg = /\.aac/;
     var mp4Reg = /\.mp4/;
     var m4aReg = /\.m4a/;
@@ -367,37 +367,37 @@
       return null;
     }
   };
-  Player.prototype.sendToNielsen = function(key, value) {
+  Player.prototype.sendToNielsen = function (key, value) {
     if (window.nSdkInstance && this.audioEl.duration === Infinity) {
       window.nSdkInstance.ggPM(key, value);
     }
   };
-  Player.prototype.unloadAudio = function() {
+  Player.prototype.unloadAudio = function () {
     this.isPlaying = false;
     this.audioEl.innerHTML = '';
     this.audioEl.load();
     this.displayStoppedState();
     this.sendToNielsen('stop', Date.now() / 1000);
   };
-  Player.prototype.playAudio = function() {
+  Player.prototype.playAudio = function () {
     this.pauseAllAudio();
     this.audioEl.play();
   };
-  Player.prototype.pauseAudio = function(currentAudio) {
+  Player.prototype.pauseAudio = function (currentAudio) {
     if (typeof currentAudio !== 'undefined') {
       currentAudio.pause();
     } else {
       this.audioEl.pause();
     }
   };
-  Player.prototype.pauseAllAudio = function() {
+  Player.prototype.pauseAllAudio = function () {
     var self = this;
     var audioEls = document.querySelectorAll('audio');
-    Array.prototype.forEach.call(audioEls, function(el) {
+    Array.prototype.forEach.call(audioEls, function (el) {
       self.pauseAudio(el);
     });
   };
-  Player.prototype.playNext = function() {
+  Player.prototype.playNext = function () {
     var nextSrc = this.getNextPlaylistSrc();
     var nextItemEl;
     if (typeof nextSrc === 'undefined' || nextSrc === null) return;
@@ -410,10 +410,13 @@
     this.loadAudioFromSources(nextSrc);
     this.playAudio();
   };
-  Player.prototype.findNext = function(src) {
+  Player.prototype.findNext = function (src) {
     return this.playlistEl.querySelector('li[data-src="' + src + '"]');
   };
-  Player.prototype.getSecondsByClickPosition = function(element, clickXPosition) {
+  Player.prototype.getSecondsByClickPosition = function (
+    element,
+    clickXPosition
+  ) {
     var timelineRect = element.getBoundingClientRect();
     var timelineOffset = timelineRect.left;
     var timelineWidth = element.offsetWidth;
@@ -423,16 +426,16 @@
     var seconds = Number(time.toFixed());
     return seconds;
   };
-  Player.prototype.seekTime = function(seconds) {
+  Player.prototype.seekTime = function (seconds) {
     this.audioEl.currentTime = seconds;
   };
-  Player.prototype.skipForward = function(seconds) {
-    this.audioEl.currentTime = this.audioEl.currentTime + seconds;
+  Player.prototype.skipForward = function (seconds) {
+    this.audioEl.currentTime = this.audioEl.currentTime + Number(seconds);
   };
-  Player.prototype.skipBack = function(seconds) {
-    this.audioEl.currentTime = this.audioEl.currentTime - seconds;
+  Player.prototype.skipBack = function (seconds) {
+    this.audioEl.currentTime = this.audioEl.currentTime - Number(seconds);
   };
-  Player.prototype.getVolumeByHorizClickPosition = function(
+  Player.prototype.getVolumeByHorizClickPosition = function (
     element,
     clickXPosition
   ) {
@@ -444,7 +447,7 @@
     var volume = Number(percent.toFixed(2));
     return volume;
   };
-  Player.prototype.getVolumeByVertClickPosition = function(
+  Player.prototype.getVolumeByVertClickPosition = function (
     element,
     clickYPosition
   ) {
@@ -457,27 +460,27 @@
     var volume = Number(percent.toFixed(2));
     return volume;
   };
-  Player.prototype.getCurrentPlaylistItem = function() {
+  Player.prototype.getCurrentPlaylistItem = function () {
     var srcString = this.el.getAttribute('data-src');
-    var items = Array.prototype.filter.call(this.playlist.itemEls, function(el) {
+    var items = Array.prototype.filter.call(this.playlist.itemEls, function (el) {
       return el.matches('[data-src="' + srcString + '"]');
     });
     var itemEl = items[0];
     return itemEl;
   };
-  Player.prototype.getNextPlaylistSrc = function() {
+  Player.prototype.getNextPlaylistSrc = function () {
     var itemEl = this.getCurrentPlaylistItem();
     return itemEl.getAttribute('data-next');
   };
-  Player.prototype.changeVolume = function(volume) {
+  Player.prototype.changeVolume = function (volume) {
     this.audioEl.volume = volume;
   };
-  Player.prototype.muteAudio = function() {
+  Player.prototype.muteAudio = function () {
     this.storedVolume = this.audioEl.volume;
     this.displayMutedState();
     this.changeVolume(0);
   };
-  Player.prototype.unmuteAudio = function() {
+  Player.prototype.unmuteAudio = function () {
     this.displayUnmutedState();
     if (this.storedVolume) {
       this.changeVolume(this.storedVolume);
@@ -485,7 +488,7 @@
       this.changeVolume(1);
     }
   };
-  Player.prototype.displayDuration = function() {
+  Player.prototype.displayDuration = function () {
     if (!this.durationEl) return;
     var duration;
     if (this.audioEl.duration !== Infinity) {
@@ -493,7 +496,7 @@
       this.durationEl.innerHTML = duration;
     }
   };
-  Player.prototype.displayCurrentTime = function() {
+  Player.prototype.displayCurrentTime = function () {
     if (!this.currentTimeEl) return;
     var currentTime = toFormatted(this.audioEl.currentTime);
     this.currentTimeEl.innerHTML = currentTime;
@@ -504,12 +507,12 @@
     }
     return this;
   };
-  Player.prototype.updateTimelineProgress = function() {
+  Player.prototype.updateTimelineProgress = function () {
     if (!this.timelineEl) return;
     var progress = (this.audioEl.currentTime / this.audioEl.duration) * 100;
     this.timelineProgressEl.style.width = progress + '%';
   };
-  Player.prototype.displayTimeRanges = function() {
+  Player.prototype.displayTimeRanges = function () {
     if (!this.timelineBufferedEl) return;
     if (this.isPlaying !== true) return;
     if (this.audioEl.duration === Infinity) return;
@@ -532,27 +535,27 @@
       }
     }
   };
-  Player.prototype.displayPlayedState = function() {
+  Player.prototype.displayPlayedState = function () {
     this.el.classList.remove(PAUSED_CLASS);
     this.el.classList.add(PLAYING_CLASS);
     if (this.hasPlaylist === true) {
       this.playlist.displayPlayedState(this.getCurrentPlaylistItem());
     }
   };
-  Player.prototype.displayPausedState = function() {
+  Player.prototype.displayPausedState = function () {
     this.el.classList.remove(PLAYING_CLASS);
     this.el.classList.add(PAUSED_CLASS);
     if (this.hasPlaylist === true) {
       this.playlist.displayPausedState(this.getCurrentPlaylistItem());
     }
   };
-  Player.prototype.displayPlayingState = function() {
+  Player.prototype.displayPlayingState = function () {
     this.removeBufferingState();
     if (this.hasPlaylist === true) {
       this.playlist.displayPlayingState(this.getCurrentPlaylistItem());
     }
   };
-  Player.prototype.displayStoppedState = function() {
+  Player.prototype.displayStoppedState = function () {
     this.el.classList.remove(PLAYING_CLASS);
     this.el.classList.remove(PAUSED_CLASS);
     this.removeBufferingState();
@@ -560,19 +563,19 @@
       this.playlist.removeDisplayStates();
     }
   };
-  Player.prototype.displayBufferingState = function() {
+  Player.prototype.displayBufferingState = function () {
     this.el.classList.add(LOADING_CLASS);
     if (this.hasPlaylist === true) {
       this.playlist.displayBufferingState(this.getCurrentPlaylistItem());
     }
   };
-  Player.prototype.removeBufferingState = function() {
+  Player.prototype.removeBufferingState = function () {
     this.el.classList.remove(LOADING_CLASS);
     if (this.hasPlaylist === true) {
       this.playlist.removeBufferingState(this.getCurrentPlaylistItem());
     }
   };
-  Player.prototype.displayCurrentVolume = function() {
+  Player.prototype.displayCurrentVolume = function () {
     if (!this.volumeBarEl) return;
     var volumePercent = this.audioEl.volume * 100;
     if (this.audioEl.volume === 0) {
@@ -587,10 +590,10 @@
     }
     return this;
   };
-  Player.prototype.displayMutedState = function() {
+  Player.prototype.displayMutedState = function () {
     this.el.classList.add(MUTED_CLASS);
   };
-  Player.prototype.displayUnmutedState = function() {
+  Player.prototype.displayUnmutedState = function () {
     this.el.classList.remove(MUTED_CLASS);
   };
 

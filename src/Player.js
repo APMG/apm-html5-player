@@ -9,7 +9,7 @@ var LOADING_CLASS = 'is-loading';
 var MUTED_CLASS = 'is-muted';
 
 // Constructor
-var Player = function(el, options) {
+var Player = function (el, options) {
   // The containing DOM element
   this.el = el;
 
@@ -36,7 +36,7 @@ var Player = function(el, options) {
 // -----------------------------
 
 // Initialize the module
-Player.prototype.init = function() {
+Player.prototype.init = function () {
   this.selectElements()
     .initPlaylist()
     .getSources()
@@ -48,7 +48,7 @@ Player.prototype.init = function() {
 };
 
 // Descendant elements of the containing DOM element
-Player.prototype.selectElements = function() {
+Player.prototype.selectElements = function () {
   // The audio element used for playback
   this.audioEl = this.el.querySelector('audio');
   // Controls
@@ -74,7 +74,7 @@ Player.prototype.selectElements = function() {
   return this;
 };
 
-Player.prototype.getSources = function() {
+Player.prototype.getSources = function () {
   // Get data-src attribute each time this is called in case the attribute changes
   try {
     this.sources = JSON.parse(
@@ -98,13 +98,13 @@ Player.prototype.getSources = function() {
 };
 
 // Setup and bind event handlers
-Player.prototype.bindEventHandlers = function() {
+Player.prototype.bindEventHandlers = function () {
   var self = this;
 
   // Click events
 
   // Apply click event to all play buttons
-  Array.prototype.forEach.call(this.playButtonEls, function(el) {
+  Array.prototype.forEach.call(this.playButtonEls, function (el) {
     el.addEventListener('click', self.onPlayClick.bind(self));
   });
 
@@ -149,12 +149,12 @@ Player.prototype.bindEventHandlers = function() {
   return this;
 };
 
-Player.prototype.initTime = function() {
+Player.prototype.initTime = function () {
   this.displayCurrentTime();
   return this;
 };
 
-Player.prototype.initPlaylist = function() {
+Player.prototype.initPlaylist = function () {
   if (this.playlistEl) {
     this.playlist = new Playlist(this);
     this.playlist.init();
@@ -168,14 +168,14 @@ Player.prototype.initPlaylist = function() {
 // Event Handlers
 // -----------------------------
 
-Player.prototype.onPlayClick = function(e) {
+Player.prototype.onPlayClick = function (e) {
   e.preventDefault();
   this.handlePlay();
 };
 
 // handler is separated from actual click event so it can be called
 // externally (e.g. from play buttons outside of the player interface)
-Player.prototype.handlePlay = function() {
+Player.prototype.handlePlay = function () {
   if (this.isPlaying === false) {
     if (this.audioEl.readyState === 0) {
       // get sources from data attribute in case it changed
@@ -191,7 +191,7 @@ Player.prototype.handlePlay = function() {
   }
 };
 
-Player.prototype.onSkipForwardClick = function(e) {
+Player.prototype.onSkipForwardClick = function (e) {
   var targetEl = e.currentTarget;
   var seconds = targetEl.getAttribute('data-skip-forward');
 
@@ -204,7 +204,7 @@ Player.prototype.onSkipForwardClick = function(e) {
   this.skipForward(seconds);
 };
 
-Player.prototype.onSkipBackClick = function(e) {
+Player.prototype.onSkipBackClick = function (e) {
   var targetEl = e.currentTarget;
   var seconds = targetEl.getAttribute('data-skip-back');
 
@@ -217,7 +217,7 @@ Player.prototype.onSkipBackClick = function(e) {
   this.skipBack(seconds);
 };
 
-Player.prototype.onTimelineClick = function(e) {
+Player.prototype.onTimelineClick = function (e) {
   var targetEl = e.currentTarget;
   var clickXPosition = e.pageX;
   var seconds = this.getSecondsByClickPosition(targetEl, clickXPosition);
@@ -227,7 +227,7 @@ Player.prototype.onTimelineClick = function(e) {
   this.seekTime(seconds);
 };
 
-Player.prototype.onVolumeClick = function(e) {
+Player.prototype.onVolumeClick = function (e) {
   var targetEl = e.currentTarget;
   var volume;
 
@@ -244,7 +244,7 @@ Player.prototype.onVolumeClick = function(e) {
   this.changeVolume(volume);
 };
 
-Player.prototype.onMuteClick = function(e) {
+Player.prototype.onMuteClick = function (e) {
   e.preventDefault();
 
   if (this.audioEl.volume !== 0) {
@@ -257,39 +257,39 @@ Player.prototype.onMuteClick = function(e) {
 // HTMLMediaElement 'play' event fires when a request
 // to play the audio has occurred. Does not necessarily mean the
 // audio is actually playing. (see 'playing' event)
-Player.prototype.onAudioPlay = function() {
+Player.prototype.onAudioPlay = function () {
   this.isPlaying = true;
   this.displayPlayedState();
 };
 
 // HTMLMediaElement 'pause' event fires when the audio gets paused
-Player.prototype.onAudioPause = function() {
+Player.prototype.onAudioPause = function () {
   this.isPlaying = false;
   this.displayPausedState();
 };
 
 // HTMLMediaElement 'timeupdate' event fires while the audio is playing
 // and the current time changes, usually several times per second
-Player.prototype.onAudioTimeupdate = function() {
+Player.prototype.onAudioTimeupdate = function () {
   this.displayCurrentTime();
   this.sendToNielsen('setPlayheadPosition', Date.now() / 1000);
 };
 
 // HTMLMediaElement 'waiting' event fires when audio is downloading
 // or interrupted, such as when buffering at first play
-Player.prototype.onAudioWaiting = function() {
+Player.prototype.onAudioWaiting = function () {
   this.displayBufferingState();
 };
 
 // HTMLMediaElement 'playing' event fires when audio has actually
 // begun playing (after being loaded)
-Player.prototype.onAudioPlaying = function() {
+Player.prototype.onAudioPlaying = function () {
   this.displayPlayingState();
 };
 
 // HTMLMediaElement 'ended' event fires when audio playback has
 // finished for the current file
-Player.prototype.onAudioEnded = function() {
+Player.prototype.onAudioEnded = function () {
   this.displayStoppedState();
   if (this.hasPlaylist === true) {
     this.playNext();
@@ -298,20 +298,20 @@ Player.prototype.onAudioEnded = function() {
 
 // HTMLMediaElement 'volumechange' event fires when the audio's
 // volume changes
-Player.prototype.onVolumeChange = function() {
+Player.prototype.onVolumeChange = function () {
   this.displayCurrentVolume();
 };
 
 // HTMLMediaElement 'onLoadedMetadata' event fires when the audio's
 // metadata has been downloaded
-Player.prototype.onLoadedMetadata = function() {
+Player.prototype.onLoadedMetadata = function () {
   this.displayDuration();
   this.sendToNielsen('loadMetadata', window.nielsenMetadataObject);
 };
 
 // HTMLMediaElement 'progress' event fires when any data
 // gets downloaded
-Player.prototype.onProgress = function() {
+Player.prototype.onProgress = function () {
   this.displayTimeRanges();
 };
 
@@ -319,7 +319,7 @@ Player.prototype.onProgress = function() {
 // Audio Element Methods
 // -----------------------------
 
-Player.prototype.loadAudioFromSources = function(sources) {
+Player.prototype.loadAudioFromSources = function (sources) {
   // Remove the src attribute on the audio element in case it was left in the HTML.
   // An empty src attribute will interfere with the inner <source> elements.
   this.audioEl.removeAttribute('src');
@@ -337,10 +337,10 @@ Player.prototype.loadAudioFromSources = function(sources) {
   this.audioEl.load();
 };
 
-Player.prototype.createSourceEls = function(sources) {
+Player.prototype.createSourceEls = function (sources) {
   var self = this;
   // Append <source> elements to the <audio> element
-  sources.forEach(function(source) {
+  sources.forEach(function (source) {
     var sourceUrl;
     var sourceType;
 
@@ -365,7 +365,7 @@ Player.prototype.createSourceEls = function(sources) {
   });
 };
 
-Player.prototype.getSourceType = function(source) {
+Player.prototype.getSourceType = function (source) {
   // We don't test for only the end of the filename in case
   // there is a cache busting string on the end
   var aacReg = /\.aac/;
@@ -389,13 +389,13 @@ Player.prototype.getSourceType = function(source) {
   }
 };
 
-Player.prototype.sendToNielsen = function(key, value) {
+Player.prototype.sendToNielsen = function (key, value) {
   if (window.nSdkInstance && this.audioEl.duration === Infinity) {
     window.nSdkInstance.ggPM(key, value);
   }
 };
 
-Player.prototype.unloadAudio = function() {
+Player.prototype.unloadAudio = function () {
   this.isPlaying = false;
   // Remove inner <source> elements
   this.audioEl.innerHTML = '';
@@ -405,12 +405,12 @@ Player.prototype.unloadAudio = function() {
   this.sendToNielsen('stop', Date.now() / 1000);
 };
 
-Player.prototype.playAudio = function() {
+Player.prototype.playAudio = function () {
   this.pauseAllAudio();
   this.audioEl.play();
 };
 
-Player.prototype.pauseAudio = function(currentAudio) {
+Player.prototype.pauseAudio = function (currentAudio) {
   if (typeof currentAudio !== 'undefined') {
     currentAudio.pause();
   } else {
@@ -418,16 +418,16 @@ Player.prototype.pauseAudio = function(currentAudio) {
   }
 };
 
-Player.prototype.pauseAllAudio = function() {
+Player.prototype.pauseAllAudio = function () {
   // Pause any audio that may already be playing on the page.
   var self = this;
   var audioEls = document.querySelectorAll('audio');
-  Array.prototype.forEach.call(audioEls, function(el) {
+  Array.prototype.forEach.call(audioEls, function (el) {
     self.pauseAudio(el);
   });
 };
 
-Player.prototype.playNext = function() {
+Player.prototype.playNext = function () {
   var nextSrc = this.getNextPlaylistSrc();
 
   var nextItemEl;
@@ -444,11 +444,14 @@ Player.prototype.playNext = function() {
   this.playAudio();
 };
 
-Player.prototype.findNext = function(src) {
+Player.prototype.findNext = function (src) {
   return this.playlistEl.querySelector('li[data-src="' + src + '"]');
 };
 
-Player.prototype.getSecondsByClickPosition = function(element, clickXPosition) {
+Player.prototype.getSecondsByClickPosition = function (
+  element,
+  clickXPosition
+) {
   var timelineRect = element.getBoundingClientRect();
   var timelineOffset = timelineRect.left;
   var timelineWidth = element.offsetWidth;
@@ -460,19 +463,19 @@ Player.prototype.getSecondsByClickPosition = function(element, clickXPosition) {
   return seconds;
 };
 
-Player.prototype.seekTime = function(seconds) {
+Player.prototype.seekTime = function (seconds) {
   this.audioEl.currentTime = seconds;
 };
 
-Player.prototype.skipForward = function(seconds) {
-  this.audioEl.currentTime = this.audioEl.currentTime + seconds;
+Player.prototype.skipForward = function (seconds) {
+  this.audioEl.currentTime = this.audioEl.currentTime + Number(seconds);
 };
 
-Player.prototype.skipBack = function(seconds) {
-  this.audioEl.currentTime = this.audioEl.currentTime - seconds;
+Player.prototype.skipBack = function (seconds) {
+  this.audioEl.currentTime = this.audioEl.currentTime - Number(seconds);
 };
 
-Player.prototype.getVolumeByHorizClickPosition = function(
+Player.prototype.getVolumeByHorizClickPosition = function (
   element,
   clickXPosition
 ) {
@@ -486,7 +489,7 @@ Player.prototype.getVolumeByHorizClickPosition = function(
   return volume;
 };
 
-Player.prototype.getVolumeByVertClickPosition = function(
+Player.prototype.getVolumeByVertClickPosition = function (
   element,
   clickYPosition
 ) {
@@ -501,32 +504,32 @@ Player.prototype.getVolumeByVertClickPosition = function(
   return volume;
 };
 
-Player.prototype.getCurrentPlaylistItem = function() {
+Player.prototype.getCurrentPlaylistItem = function () {
   var srcString = this.el.getAttribute('data-src');
-  var items = Array.prototype.filter.call(this.playlist.itemEls, function(el) {
+  var items = Array.prototype.filter.call(this.playlist.itemEls, function (el) {
     return el.matches('[data-src="' + srcString + '"]');
   });
   var itemEl = items[0];
   return itemEl;
 };
 
-Player.prototype.getNextPlaylistSrc = function() {
+Player.prototype.getNextPlaylistSrc = function () {
   var itemEl = this.getCurrentPlaylistItem();
   return itemEl.getAttribute('data-next');
 };
 
-Player.prototype.changeVolume = function(volume) {
+Player.prototype.changeVolume = function (volume) {
   this.audioEl.volume = volume;
 };
 
-Player.prototype.muteAudio = function() {
+Player.prototype.muteAudio = function () {
   this.storedVolume = this.audioEl.volume;
 
   this.displayMutedState();
   this.changeVolume(0);
 };
 
-Player.prototype.unmuteAudio = function() {
+Player.prototype.unmuteAudio = function () {
   this.displayUnmutedState();
   if (this.storedVolume) {
     this.changeVolume(this.storedVolume);
@@ -536,7 +539,7 @@ Player.prototype.unmuteAudio = function() {
 };
 
 // Displays the length of the audio file
-Player.prototype.displayDuration = function() {
+Player.prototype.displayDuration = function () {
   // Exit if no duration element in DOM
   if (!this.durationEl) return;
 
@@ -549,7 +552,7 @@ Player.prototype.displayDuration = function() {
 };
 
 // Changes the current time numbers while playing
-Player.prototype.displayCurrentTime = function() {
+Player.prototype.displayCurrentTime = function () {
   // Exit if current time element isn't in DOM
   if (!this.currentTimeEl) return;
 
@@ -565,7 +568,7 @@ Player.prototype.displayCurrentTime = function() {
 };
 
 // Modifies timeline length based on progress
-Player.prototype.updateTimelineProgress = function() {
+Player.prototype.updateTimelineProgress = function () {
   // Exit if there is no timeline in DOM
   if (!this.timelineEl) return;
 
@@ -575,7 +578,7 @@ Player.prototype.updateTimelineProgress = function() {
 
 // Show the portions of the file that have been downloaded
 // (i.e. 'buffered') on the timeline
-Player.prototype.displayTimeRanges = function() {
+Player.prototype.displayTimeRanges = function () {
   // Exit if there is no timeline element
   if (!this.timelineBufferedEl) return;
   // Exit if audio isn't playing
@@ -606,7 +609,7 @@ Player.prototype.displayTimeRanges = function() {
 };
 
 // Modifies the play/pause button state
-Player.prototype.displayPlayedState = function() {
+Player.prototype.displayPlayedState = function () {
   this.el.classList.remove(PAUSED_CLASS);
   this.el.classList.add(PLAYING_CLASS);
 
@@ -616,7 +619,7 @@ Player.prototype.displayPlayedState = function() {
 };
 
 // Modifies the play/pause button state
-Player.prototype.displayPausedState = function() {
+Player.prototype.displayPausedState = function () {
   this.el.classList.remove(PLAYING_CLASS);
   this.el.classList.add(PAUSED_CLASS);
 
@@ -626,7 +629,7 @@ Player.prototype.displayPausedState = function() {
 };
 
 // Modifies the timeline
-Player.prototype.displayPlayingState = function() {
+Player.prototype.displayPlayingState = function () {
   this.removeBufferingState();
 
   if (this.hasPlaylist === true) {
@@ -635,7 +638,7 @@ Player.prototype.displayPlayingState = function() {
 };
 
 // Modifies the timeline, button displays paused state
-Player.prototype.displayStoppedState = function() {
+Player.prototype.displayStoppedState = function () {
   this.el.classList.remove(PLAYING_CLASS);
   this.el.classList.remove(PAUSED_CLASS);
   this.removeBufferingState();
@@ -646,7 +649,7 @@ Player.prototype.displayStoppedState = function() {
 };
 
 // Adds buffering styles to timeline
-Player.prototype.displayBufferingState = function() {
+Player.prototype.displayBufferingState = function () {
   this.el.classList.add(LOADING_CLASS);
 
   if (this.hasPlaylist === true) {
@@ -655,7 +658,7 @@ Player.prototype.displayBufferingState = function() {
 };
 
 // Removes buffering styles from timeline
-Player.prototype.removeBufferingState = function() {
+Player.prototype.removeBufferingState = function () {
   this.el.classList.remove(LOADING_CLASS);
 
   if (this.hasPlaylist === true) {
@@ -663,7 +666,7 @@ Player.prototype.removeBufferingState = function() {
   }
 };
 
-Player.prototype.displayCurrentVolume = function() {
+Player.prototype.displayCurrentVolume = function () {
   if (!this.volumeBarEl) return;
 
   var volumePercent = this.audioEl.volume * 100;
@@ -683,11 +686,11 @@ Player.prototype.displayCurrentVolume = function() {
   return this;
 };
 
-Player.prototype.displayMutedState = function() {
+Player.prototype.displayMutedState = function () {
   this.el.classList.add(MUTED_CLASS);
 };
 
-Player.prototype.displayUnmutedState = function() {
+Player.prototype.displayUnmutedState = function () {
   this.el.classList.remove(MUTED_CLASS);
 };
 
