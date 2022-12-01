@@ -4,16 +4,21 @@
   (global = global || self, factory(global.ApmPlayer = {}));
 }(this, function (exports) { 'use strict';
 
+  // Formats an ugly time (in seconds) to a nice readable format
+  // e.g. 125 > 2:05, or 4226 > 1:10:26
   function toFormatted(timeInSeconds) {
     timeInSeconds = Math.round(timeInSeconds);
+
     var formattedTime = '';
     var formattedMinutes = '';
     var formattedSeconds = '';
     var hours = Math.floor(timeInSeconds / 3600);
     var minutes = Math.floor(timeInSeconds / 60 - hours * 60);
     var seconds = timeInSeconds - minutes * 60 - hours * 3600;
+
     if (hours !== 0) {
       formattedTime = hours + ':';
+
       if (minutes < 10) {
         formattedMinutes = '0' + minutes;
       } else {
@@ -22,53 +27,82 @@
     } else {
       formattedMinutes = minutes.toString();
     }
+
     if (seconds < 10) {
       formattedSeconds = '0' + seconds;
     } else {
       formattedSeconds = seconds.toString();
     }
+
     formattedTime = formattedTime + formattedMinutes + ':' + formattedSeconds;
+
     return formattedTime;
   }
 
+  // Required modules for page load
+
+  // Constructor
+  // The 'parent' argument passed in is the parent object from Player.js.
+  // This script is only intended to be used with that Player.js.
   var Playlist = function(parent) {
     this.player = parent;
+    // The containing DOM element
     this.el = this.player.playlistEl;
   };
+
+  // -----------------------------
+  // Setup functions
+  // -----------------------------
+
   Playlist.prototype.init = function() {
     this.selectElements()
       .setNextItem()
       .bindEventHandlers();
   };
+
   Playlist.prototype.selectElements = function() {
     this.itemEls = this.el.querySelectorAll('.js-playlist-item');
+
     return this;
   };
+
   Playlist.prototype.setNextItem = function() {
     Array.prototype.forEach.call(this.itemEls, function(currentItemEl) {
       var nextItemEl = currentItemEl.nextElementSibling;
       var nextSrc;
+
       if (!nextItemEl) {
         return;
       }
+
       nextSrc = nextItemEl.getAttribute('data-src');
       currentItemEl.setAttribute('data-next', nextSrc);
     });
+
     return this;
   };
+
   Playlist.prototype.bindEventHandlers = function() {
     var self = this;
+
     Array.prototype.forEach.call(this.itemEls, function(el) {
       el.addEventListener('click', self.onItemClick.bind(self));
     });
+
     return this;
   };
+
+  // -----------------------------
+  // Event Handlers
+  // -----------------------------
+
   Playlist.prototype.onItemClick = function(e) {
     e.preventDefault();
     var targetEl = e.currentTarget;
     var src = targetEl.getAttribute('data-src');
     var title = targetEl.getAttribute('data-title');
     var artist = targetEl.getAttribute('data-artist');
+
     this.player.el.setAttribute('data-src', src);
     this.player.loadAudioFromSources(src);
     this.player.playAudio();
@@ -76,28 +110,40 @@
     this.displayBufferingState(targetEl);
     this.populatePlayerInfo(title, artist);
   };
+
+  // -----------------------------
+  // Helpers
+  // -----------------------------
+
   Playlist.prototype.displayPlayedState = function(el) {
     this.removeDisplayStates();
     el.classList.add('is-playing');
   };
+
   Playlist.prototype.displayPlayingState = function(el) {
     this.removeBufferingState(el);
     this.removePausedState(el);
   };
+
   Playlist.prototype.displayPausedState = function(el) {
     el.classList.add('is-paused');
   };
+
   Playlist.prototype.removePausedState = function(el) {
     el.classList.remove('is-paused');
   };
+
   Playlist.prototype.displayBufferingState = function(el) {
     el.classList.add('is-loading');
   };
+
   Playlist.prototype.removeBufferingState = function(el) {
     el.classList.remove('is-loading');
   };
+
   Playlist.prototype.removeDisplayStates = function() {
     var self = this;
+
     Array.prototype.forEach.call(this.itemEls, function(el) {
       self.removeBufferingState(el);
       self.removePausedState(el);
@@ -105,26 +151,50 @@
       el.classList.remove('is-active');
     });
   };
+
   Playlist.prototype.populatePlayerInfo = function(title, artist) {
     this.player.titleEl.textContent = title;
     this.player.artistEl.textContent = artist;
   };
 
+  // import Playlist from './Playlist';
+
+  // Constants
   var PLAYING_CLASS = 'is-playing';
   var PAUSED_CLASS = 'is-paused';
   var LOADING_CLASS = 'is-loading';
   var MUTED_CLASS = 'is-muted';
+
+  // Constructor
   var Player = function(el, options) {
+    // The containing DOM element
     this.el = el;
+
+    // An object with player options
     this.options = options;
+
+    // The playing/paused state of the Player
     this.isPlaying = false;
+
+    // A variable to store the previous volume the player was set at.
     this.storedVolume = 1;
+
+    // References to the playlist
     this.playlistSelector = this.el.getAttribute('data-playlist');
     this.playlistEl = document.querySelector(this.playlistSelector);
+    // The playlist module, initialized later
     this.playlist;
+    // Set to true when playlist is initialized
     this.hasPlaylist = false;
+    // Set to true when mousedown on audio timelineEl
     this.isSeeking = false;
   };
+
+  // -----------------------------
+  // Initialized functions
+  // -----------------------------
+
+  // Initialize the module
   Player.prototype.init = function() {
     this.selectElements()
       .initPlaylist()
@@ -132,10 +202,15 @@
       .bindEventHandlers()
       .initTime()
       .displayCurrentVolume();
+
     return this;
   };
+
+  // Descendant elements of the containing DOM element
   Player.prototype.selectElements = function() {
+    // The audio element used for playback
     this.audioEl = this.el.querySelector('audio');
+    // Controls
     this.playButtonEls = this.el.querySelectorAll('.js-player-play');
     this.skipForwardButtonEl = this.el.querySelector('[data-skip-forward]');
     this.skipBackButtonEl = this.el.querySelector('[data-skip-back]');
@@ -149,43 +224,61 @@
       this.volumeBarEl &&
       this.volumeBarEl.querySelector('.js-player-volume-current');
     this.muteButtonEl = this.el.querySelector('.js-player-mute');
+    // Info
     this.durationEl = this.el.querySelector('.js-player-duration');
     this.currentTimeEl = this.el.querySelector('.js-player-currentTime');
     this.titleEl = this.el.querySelector('.js-player-title');
     this.artistEl = this.el.querySelector('.js-player-artist');
+
     return this;
   };
+
   Player.prototype.getSources = function() {
+    // Get data-src attribute each time this is called in case the attribute changes
     try {
       this.sources = JSON.parse(
+        // decodeURI is used in case any URL characters (like %20 for spaces) are in the string
         decodeURI(this.el.getAttribute('data-src')).replace(/'/g, '"')
       );
     } catch (e) {
       if (typeof console !== 'undefined') {
+        // If the error is anything other than not evaluating to JSON, print to console
         var syntaxReg = /^\s*SyntaxError: Unexpected token|^\s*SyntaxError: Unexpected end of JSON input/;
         if (!syntaxReg.test(e)) {
+          // eslint-disable-next-line
           console.log(e);
         }
       }
+
       this.sources = this.el.getAttribute('data-src');
     }
+
     return this;
   };
+
+  // Setup and bind event handlers
   Player.prototype.bindEventHandlers = function() {
     var self = this;
+
+    // Click events
+
+    // Apply click event to all play buttons
     Array.prototype.forEach.call(this.playButtonEls, function(el) {
       el.addEventListener('click', self.onPlayClick.bind(self));
     });
+
     this.skipForwardButtonEl &&
       this.skipForwardButtonEl.addEventListener(
         'click',
         this.onSkipForwardClick.bind(this)
       );
+
     this.skipBackButtonEl &&
       this.skipBackButtonEl.addEventListener(
         'click',
         this.onSkipBackClick.bind(this)
       );
+
     if (this.timelineEl) {
       this.timelineEl.addEventListener(
         'mousedown',
@@ -202,8 +295,11 @@
     }
     this.volumeBarEl &&
       this.volumeBarEl.addEventListener('click', this.onVolumeClick.bind(this));
+
     this.muteButtonEl &&
       this.muteButtonEl.addEventListener('click', this.onMuteClick.bind(this));
+
+    // Audio element events
     this.audioEl.addEventListener('play', this.onAudioPlay.bind(this));
     this.audioEl.addEventListener('pause', this.onAudioPause.bind(this));
     this.audioEl.addEventListener(
@@ -219,27 +315,45 @@
       this.onLoadedMetadata.bind(this)
     );
     this.audioEl.addEventListener('progress', this.onProgress.bind(this));
+
     return this;
   };
+
   Player.prototype.initTime = function() {
     this.displayCurrentTime();
     return this;
   };
+
   Player.prototype.initPlaylist = function() {
     if (this.playlistEl) {
       this.playlist = new Playlist(this);
       this.playlist.init();
       this.hasPlaylist = true;
     }
+
     return this;
   };
+
+  // -----------------------------
+  // Event Handlers
+  // -----------------------------
+
   Player.prototype.onPlayClick = function(e) {
     e.preventDefault();
-    this.handlePlay();
+    const button = e.target.closest('.js-player-play');
+    button.disabled = true;
+    setTimeout(() => {
+      this.handlePlay();
+      button.disabled = false;
+    }, 200);
   };
+
+  // handler is separated from actual click event so it can be called
+  // externally (e.g. from play buttons outside of the player interface)
   Player.prototype.handlePlay = function() {
     if (this.isPlaying === false) {
       if (this.audioEl.readyState === 0) {
+        // get sources from data attribute in case it changed
         this.getSources();
         this.loadAudioFromSources(this.sources);
       }
@@ -251,45 +365,61 @@
       }
     }
   };
+
   Player.prototype.onSkipForwardClick = function(e) {
     var targetEl = e.currentTarget;
     var seconds = targetEl.getAttribute('data-skip-forward');
+
     e.preventDefault();
+
     if (this.audioEl.duration === Infinity) {
       return;
     }
+
     this.skipForward(seconds);
   };
+
   Player.prototype.onSkipBackClick = function(e) {
     var targetEl = e.currentTarget;
     var seconds = targetEl.getAttribute('data-skip-back');
+
     e.preventDefault();
+
     if (this.audioEl.duration === Infinity) {
       return;
     }
+
     this.skipBack(seconds);
   };
+
   Player.prototype.onTimelineMousedown = function(e) {
     var targetEl = e.currentTarget;
     var clickXPosition = e.pageX;
     var seconds = this.getSecondsByClickPosition(targetEl, clickXPosition);
+
     e.preventDefault(e);
+
     this.seekTime(seconds);
     this.isSeeking = true;
   };
+
   Player.prototype.onTimelineMouseup = function(e) {
     e.preventDefault(e);
+
     this.isSeeking = false;
   };
+
   Player.prototype.onTimelineMousemove = function(e) {
     e.preventDefault(e);
     if (this.isSeeking) {
       this.onTimelineMousedown(e);
     }
   };
+
   Player.prototype.onVolumeClick = function(e) {
     var targetEl = e.currentTarget;
     var volume;
+
     if (targetEl.getAttribute('data-volume-direction') === 'h') {
       var clickXPosition = e.pageX;
       volume = this.getVolumeByHorizClickPosition(targetEl, clickXPosition);
@@ -297,65 +427,114 @@
       var clickYPosition = e.pageY;
       volume = this.getVolumeByVertClickPosition(targetEl, clickYPosition);
     }
+
     e.preventDefault();
+
     this.changeVolume(volume);
   };
+
   Player.prototype.onMuteClick = function(e) {
     e.preventDefault();
+
     if (this.audioEl.volume !== 0) {
       this.muteAudio();
     } else {
       this.unmuteAudio();
     }
   };
+
+  // HTMLMediaElement 'play' event fires when a request
+  // to play the audio has occurred. Does not necessarily mean the
+  // audio is actually playing. (see 'playing' event)
   Player.prototype.onAudioPlay = function() {
     this.isPlaying = true;
     this.displayPlayedState();
   };
+
+  // HTMLMediaElement 'pause' event fires when the audio gets paused
   Player.prototype.onAudioPause = function() {
     this.isPlaying = false;
     this.displayPausedState();
   };
+
+  // HTMLMediaElement 'timeupdate' event fires while the audio is playing
+  // and the current time changes, usually several times per second
   Player.prototype.onAudioTimeupdate = function() {
     this.displayCurrentTime();
     this.sendToNielsen('setPlayheadPosition', Date.now() / 1000);
   };
+
+  // HTMLMediaElement 'waiting' event fires when audio is downloading
+  // or interrupted, such as when buffering at first play
   Player.prototype.onAudioWaiting = function() {
     this.displayBufferingState();
   };
+
+  // HTMLMediaElement 'playing' event fires when audio has actually
+  // begun playing (after being loaded)
   Player.prototype.onAudioPlaying = function() {
     this.displayPlayingState();
   };
+
+  // HTMLMediaElement 'ended' event fires when audio playback has
+  // finished for the current file
   Player.prototype.onAudioEnded = function() {
     this.displayStoppedState();
     if (this.hasPlaylist === true) {
       this.playNext();
     }
   };
+
+  // HTMLMediaElement 'volumechange' event fires when the audio's
+  // volume changes
   Player.prototype.onVolumeChange = function() {
     this.displayCurrentVolume();
   };
+
+  // HTMLMediaElement 'onLoadedMetadata' event fires when the audio's
+  // metadata has been downloaded
   Player.prototype.onLoadedMetadata = function() {
     this.displayDuration();
     this.sendToNielsen('loadMetadata', window.nielsenMetadataObject);
   };
+
+  // HTMLMediaElement 'progress' event fires when any data
+  // gets downloaded
   Player.prototype.onProgress = function() {
     this.displayTimeRanges();
   };
+
+  // -----------------------------
+  // Audio Element Methods
+  // -----------------------------
+
   Player.prototype.loadAudioFromSources = function(sources) {
+    // Remove the src attribute on the audio element in case it was left in the HTML.
+    // An empty src attribute will interfere with the inner <source> elements.
     this.audioEl.removeAttribute('src');
+    // Clear any existing <source> elements
     this.audioEl.innerHTML = '';
+
     if (typeof sources === 'string') {
+      // Turn a string value into an array with one item
+      // This is in this function so that loadAudioFromSources()
+      // can be called externally with a string if needed
       sources = sources.split();
     }
+
     this.createSourceEls(sources);
     this.audioEl.load();
   };
+
   Player.prototype.createSourceEls = function(sources) {
     var self = this;
+    // Append <source> elements to the <audio> element
     sources.forEach(function(source) {
       var sourceUrl;
       var sourceType;
+
+      // if using a source object, get the type from the object,
+      // fall back to figure it out based on the filename
       if (typeof source === 'object' && !Array.isArray(source)) {
         sourceUrl = source.url;
         sourceType = source.type;
@@ -363,20 +542,27 @@
         sourceUrl = source;
         sourceType = self.getSourceType(source);
       }
+
+      // Generate the html
       var sourceEl = document.createElement('source');
       sourceEl.setAttribute('src', sourceUrl);
+      // Only set a type if sourceType is not null
       if (sourceType !== null) {
         sourceEl.setAttribute('type', sourceType);
       }
       self.audioEl.appendChild(sourceEl);
     });
   };
+
   Player.prototype.getSourceType = function(source) {
+    // We don't test for only the end of the filename in case
+    // there is a cache busting string on the end
     var aacReg = /\.aac/;
     var mp4Reg = /\.mp4/;
     var m4aReg = /\.m4a/;
     var oggReg = /\.ogg|\.oga/;
     var mp3Reg = /\.mp3/;
+
     if (aacReg.test(source)) {
       return 'audio/aac';
     } else if (mp4Reg.test(source)) {
@@ -391,22 +577,28 @@
       return null;
     }
   };
+
   Player.prototype.sendToNielsen = function(key, value) {
     if (window.nSdkInstance && this.audioEl.duration === Infinity) {
       window.nSdkInstance.ggPM(key, value);
     }
   };
+
   Player.prototype.unloadAudio = function() {
     this.isPlaying = false;
+    // Remove inner <source> elements
     this.audioEl.innerHTML = '';
+    // Forces the audio element to read the (nonexistent) <source> elements and update
     this.audioEl.load();
     this.displayStoppedState();
     this.sendToNielsen('stop', Date.now() / 1000);
   };
+
   Player.prototype.playAudio = function() {
     this.pauseAllAudio();
     this.audioEl.play();
   };
+
   Player.prototype.pauseAudio = function(currentAudio) {
     if (typeof currentAudio !== 'undefined') {
       currentAudio.pause();
@@ -414,17 +606,23 @@
       this.audioEl.pause();
     }
   };
+
   Player.prototype.pauseAllAudio = function() {
+    // Pause any audio that may already be playing on the page.
     var self = this;
     var audioEls = document.querySelectorAll('audio');
     Array.prototype.forEach.call(audioEls, function(el) {
       self.pauseAudio(el);
     });
   };
+
   Player.prototype.playNext = function() {
     var nextSrc = this.getNextPlaylistSrc();
+
     var nextItemEl;
+
     if (typeof nextSrc === 'undefined' || nextSrc === null) return;
+
     this.el.setAttribute('data-src', nextSrc);
     nextItemEl = this.findNext(nextSrc);
     this.playlist.populatePlayerInfo(
@@ -434,9 +632,11 @@
     this.loadAudioFromSources(nextSrc);
     this.playAudio();
   };
+
   Player.prototype.findNext = function(src) {
     return this.playlistEl.querySelector('li[data-src="' + src + '"]');
   };
+
   Player.prototype.getSecondsByClickPosition = function(element, clickXPosition) {
     var timelineRect = element.getBoundingClientRect();
     var timelineOffset = timelineRect.left;
@@ -445,17 +645,22 @@
     var percent = positionInElement / timelineWidth;
     var time = this.audioEl.duration * percent;
     var seconds = Number(time.toFixed());
+
     return seconds;
   };
+
   Player.prototype.seekTime = function(seconds) {
     this.audioEl.currentTime = seconds;
   };
+
   Player.prototype.skipForward = function(seconds) {
     this.audioEl.currentTime = this.audioEl.currentTime + Number(seconds);
   };
+
   Player.prototype.skipBack = function(seconds) {
     this.audioEl.currentTime = this.audioEl.currentTime - Number(seconds);
   };
+
   Player.prototype.getVolumeByHorizClickPosition = function(
     element,
     clickXPosition
@@ -466,8 +671,10 @@
     var positionInElement = clickXPosition - volumeBarOffset;
     var percent = positionInElement / volumeBarWidth;
     var volume = Number(percent.toFixed(2));
+
     return volume;
   };
+
   Player.prototype.getVolumeByVertClickPosition = function(
     element,
     clickYPosition
@@ -479,8 +686,10 @@
     var positionFromBottom = volumeBarHeight - positionInElement;
     var percent = positionFromBottom / volumeBarHeight;
     var volume = Number(percent.toFixed(2));
+
     return volume;
   };
+
   Player.prototype.getCurrentPlaylistItem = function() {
     var srcString = this.el.getAttribute('data-src');
     var items = Array.prototype.filter.call(this.playlist.itemEls, function(el) {
@@ -489,18 +698,23 @@
     var itemEl = items[0];
     return itemEl;
   };
+
   Player.prototype.getNextPlaylistSrc = function() {
     var itemEl = this.getCurrentPlaylistItem();
     return itemEl.getAttribute('data-next');
   };
+
   Player.prototype.changeVolume = function(volume) {
     this.audioEl.volume = volume;
   };
+
   Player.prototype.muteAudio = function() {
     this.storedVolume = this.audioEl.volume;
+
     this.displayMutedState();
     this.changeVolume(0);
   };
+
   Player.prototype.unmuteAudio = function() {
     this.displayUnmutedState();
     if (this.storedVolume) {
@@ -509,16 +723,25 @@
       this.changeVolume(1);
     }
   };
+
+  // Displays the length of the audio file
   Player.prototype.displayDuration = function() {
+    // Exit if no duration element in DOM
     if (!this.durationEl) return;
+
     var duration;
+
     if (this.audioEl.duration !== Infinity) {
       duration = toFormatted(this.audioEl.duration);
       this.durationEl.innerHTML = duration;
     }
   };
+
+  // Changes the current time numbers while playing
   Player.prototype.displayCurrentTime = function() {
+    // Exit if current time element isn't in DOM
     if (!this.currentTimeEl) return;
+
     var currentTime = toFormatted(this.audioEl.currentTime);
     this.currentTimeEl.innerHTML = currentTime;
     if (this.audioEl.duration === Infinity) {
@@ -526,25 +749,39 @@
     } else {
       this.updateTimelineProgress();
     }
+
     return this;
   };
+
+  // Modifies timeline length based on progress
   Player.prototype.updateTimelineProgress = function() {
+    // Exit if there is no timeline in DOM
     if (!this.timelineEl) return;
+
     var progress = (this.audioEl.currentTime / this.audioEl.duration) * 100;
     this.timelineProgressEl.style.width = progress + '%';
   };
+
+  // Show the portions of the file that have been downloaded
+  // (i.e. 'buffered') on the timeline
   Player.prototype.displayTimeRanges = function() {
+    // Exit if there is no timeline element
     if (!this.timelineBufferedEl) return;
+    // Exit if audio isn't playing
     if (this.isPlaying !== true) return;
+    // Exit if live audio is playing
     if (this.audioEl.duration === Infinity) return;
+
     for (var i = 0; i < this.audioEl.buffered.length; i++) {
       var currentBuffer = i;
+
       if (this.audioEl.buffered.start(currentBuffer) < this.audioEl.currentTime) {
         var startX = this.audioEl.buffered.start(currentBuffer);
         var endX = this.audioEl.buffered.end(currentBuffer);
         var posXPercent = (startX / this.audioEl.duration) * 100;
         var widthPercent = ((endX - startX) / this.audioEl.duration) * 100;
         var timeRangeEls = this.timelineBufferedEl.children;
+
         if (timeRangeEls[currentBuffer]) {
           timeRangeEls[currentBuffer].style.left = posXPercent + '%';
           timeRangeEls[currentBuffer].style.width = widthPercent + '%';
@@ -556,85 +793,129 @@
       }
     }
   };
+
+  // Modifies the play/pause button state
   Player.prototype.displayPlayedState = function() {
     this.el.classList.remove(PAUSED_CLASS);
     this.el.classList.add(PLAYING_CLASS);
+
     if (this.hasPlaylist === true) {
       this.playlist.displayPlayedState(this.getCurrentPlaylistItem());
     }
   };
+
+  // Modifies the play/pause button state
   Player.prototype.displayPausedState = function() {
     this.el.classList.remove(PLAYING_CLASS);
     this.el.classList.add(PAUSED_CLASS);
+
     if (this.hasPlaylist === true) {
       this.playlist.displayPausedState(this.getCurrentPlaylistItem());
     }
   };
+
+  // Modifies the timeline
   Player.prototype.displayPlayingState = function() {
     this.removeBufferingState();
+
     if (this.hasPlaylist === true) {
       this.playlist.displayPlayingState(this.getCurrentPlaylistItem());
     }
   };
+
+  // Modifies the timeline, button displays paused state
   Player.prototype.displayStoppedState = function() {
     this.el.classList.remove(PLAYING_CLASS);
     this.el.classList.remove(PAUSED_CLASS);
     this.removeBufferingState();
+
     if (this.hasPlaylist === true) {
       this.playlist.removeDisplayStates();
     }
   };
+
+  // Adds buffering styles to timeline
   Player.prototype.displayBufferingState = function() {
     this.el.classList.add(LOADING_CLASS);
+
     if (this.hasPlaylist === true) {
       this.playlist.displayBufferingState(this.getCurrentPlaylistItem());
     }
   };
+
+  // Removes buffering styles from timeline
   Player.prototype.removeBufferingState = function() {
     this.el.classList.remove(LOADING_CLASS);
+
     if (this.hasPlaylist === true) {
       this.playlist.removeBufferingState(this.getCurrentPlaylistItem());
     }
   };
+
   Player.prototype.displayCurrentVolume = function() {
     if (!this.volumeBarEl) return;
+
     var volumePercent = this.audioEl.volume * 100;
+
     if (this.audioEl.volume === 0) {
       this.displayMutedState();
     } else {
       this.displayUnmutedState();
     }
+
     if (this.volumeBarEl.getAttribute('data-volume-direction') === 'h') {
       this.currentVolumeEl.style.width = volumePercent + '%';
     } else {
       this.currentVolumeEl.style.height = volumePercent + '%';
     }
+
     return this;
   };
+
   Player.prototype.displayMutedState = function() {
     this.el.classList.add(MUTED_CLASS);
   };
+
   Player.prototype.displayUnmutedState = function() {
     this.el.classList.remove(MUTED_CLASS);
   };
 
   var NielsenSetup = function() {};
+
   NielsenSetup.prototype.init = function(params, metadata) {
     window.nielsenMetadataObject = metadata;
     window.nSdkInstance = window.NOLCMB.getInstance(params);
     window.nSdkInstance.ggInitialize(params);
   };
 
+  /*
+   * Google Analytics plug-in for HTML5 Player
+   *
+   * Example Usage:
+   * var example_analytics = new HTML5PlayerGoogleAnalytics();
+   * example_analytics.init({ version: 'classic' ,  audio: $('#audio') }); // omit 'version' property to default to 'universal'
+   * Note Marketplace uses universal anaylics now.
+   * Conceptually its probably easiest ot think about this piece of code as something that registers
+   * event listeners (start, end and timeupdate) for the HTML5 audio player. Then we send a Google Analytics event on START,
+   * FINISH and 25, 50 amd 75% the way through aka Quartiles.
+   */
+
   function HTML5PlayerGoogleAnalytics(args) {
     var self = this;
+
+    /* Default to Google Analytics Universal API */
     this.ga_version = 'universal';
+    //@todo  rethink the use of isFirstPlay as a statemachine and make it its own object?
     this.isFirstPlay = true;
     this.lastsrc = '';
     this.quartile = 0;
+
     function checkSources() {
       self.isFirstPlay = self.audioele.currentSrc === self.lastsrc ? false : true;
       self.lastsrc = self.audioele.currentSrc;
     }
+
+    /* Return category 'Live Audio', 'On-Demand Audio' or in rare instances 'Underwriting' */
     function getCategory() {
       var cat;
       if (self.audioele.currentSrc.indexOf('stream.publicradio.org') > -1) {
@@ -644,26 +925,38 @@
       }
       return cat;
     }
+
     function audioSrcForReporting() {
       return self.audioele.currentSrc.replace(
         'http://play.publicradio.org/api-2.0.1/o',
         ''
       );
     }
+
     function percent_played() {
       return self.audioele.currentTime / self.audioele.duration;
     }
+
+    /* Triggered every 100ms with position update data */
     function onPositionUpdate() {
       if (self.audioele.duration === Infinity) {
-        return;
+        return; // bail if it is live audio
       }
       var category = getCategory();
       var src = audioSrcForReporting();
       var percent = percent_played();
       var quartile = Math.floor((percent + 0.02) * 4);
+
+      // Track quartiles played for static audio, but not underwriting.
+      // Log 'QUARTILE-2', and 'QUARTILE-3', but not 'QUARTILE-1', or 'QUARTILE-4'.
+      // We don't need to log QUARTILE-1 because START is the same thing.
+      // We don't need to log QUARTILE-4 because FINISHED is the same thing.
       if (quartile > self.quartile && percent > 0 && percent !== 1) {
         self.quartile = quartile;
+
         if (quartile <= 3) {
+          //console.log('About to call with: ' );
+          //console.log({ category: category, action: 'QUARTILE-'+quartile, label: src});
           trackEvent({
             category: category,
             action: 'QUARTILE-' + quartile,
@@ -672,40 +965,60 @@
         }
       }
     }
+
     function onMediaFinished() {
       var category = getCategory();
       var src = audioSrcForReporting();
+      //console.log('About to call with: ' );
+      //console.log({ category: category, action: 'FINISHED', label: src});
       trackEvent({ category: category, action: 'FINISHED', label: src });
       self.isFirstPlay = true;
     }
+
     function onPlayPause() {
       var category = getCategory(),
         src = audioSrcForReporting();
+
       checkSources();
+
+      // Track only the first 'PLAY' event as 'START' (we don't care about 'PAUSE' status)
       if (self.isFirstPlay === true) {
+        //console.log('About to call with: ' );
+        //console.log({ category: category, action: 'START', label: src});
         trackEvent({ category: category, action: 'START', label: src });
       }
     }
+
+    /* Handle Google Universal or Classic API calls
+     * @example trackEvent({ category: 'Live Audio' action: 'START', label: meta.identifier });
+     * @example trackEvent({ category: 'On-Demand Audio' action: 'FINISHED', label: meta.identifier });
+     */
     function trackEvent(event) {
       if (typeof window.ga === 'undefined') {
-        return;
+        return; // bail if no google analytics or ad blocker
       }
+      // Test that an object was passed
       if (typeof event !== 'object') {
         console.error('object expected');
         return;
       }
+
+      // Test that the object contains required attributes
       if (typeof event.category === 'undefined') {
         console.error('event category expected');
         return;
       }
+
       if (typeof event.action === 'undefined') {
         console.error('event action expected');
         return;
       }
+
       if (typeof event.label === 'undefined') {
         console.error('event label expected');
         return;
       }
+
       if (self.ga_version === 'universal') {
         window.ga('send', 'event', event.category, event.action, event.label, {
           nonInteraction: 1
@@ -721,16 +1034,21 @@
         ]);
       }
     }
+
     this.init = function(args) {
+      // Set ga_version to 'universal' or 'classic'.
+      // Events will be tracked using the proper Javascript API in trackEvent().
       if (typeof args.audio === 'undefined') {
         console.error('Audio element must be passed in');
       }
       if (typeof args.version !== 'undefined') {
+        // Otherwise use provided argument, whitelisting options 'universal' or 'classic'.
         self.ga_version =
           args.version === 'universal' || args.version === 'classic'
             ? args.version
             : self.ga_version;
       }
+
       self.audioele = args.audio;
       self.audioele.addEventListener('timeupdate', onPositionUpdate);
       self.audioele.addEventListener('ended', onMediaFinished);
