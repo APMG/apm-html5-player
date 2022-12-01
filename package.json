@@ -3,7 +3,6 @@
     "Matt Aho <maho@mpr.org>",
     "Geoffrey Hankerson <ghankerson@mpr.org>"
   ],
-  "dependencies": {},
   "description": "Javascript library for APM html5 audio players",
   "files": [
     "dist/**/*"

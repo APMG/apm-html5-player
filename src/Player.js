@@ -183,7 +183,12 @@ Player.prototype.initPlaylist = function() {
 
 Player.prototype.onPlayClick = function(e) {
   e.preventDefault();
-  this.handlePlay();
+  const button = e.target.closest('.js-player-play');
+  button.disabled = true;
+  setTimeout(() => {
+    this.handlePlay();
+    button.disabled = false;
+  }, 200);
 };
 
 // handler is separated from actual click event so it can be called
