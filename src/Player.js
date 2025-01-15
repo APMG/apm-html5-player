@@ -437,8 +437,9 @@ Player.prototype.unloadAudio = function() {
   this.sendToNielsen('stop', Date.now() / 1000);
 };
 
-Player.prototype.playAudio = function() {
+Player.prototype.playAudio = async function() {
   this.pauseAllAudio();
+  await this.audioEl.load();
   this.audioEl.play();
 };
 
