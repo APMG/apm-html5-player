@@ -439,7 +439,9 @@ Player.prototype.unloadAudio = function() {
 
 Player.prototype.playAudio = async function() {
   this.pauseAllAudio();
-  await this.audioEl.load();
+  // https://developer.mozilla.org/en-US/docs/Web/API/HTMLMediaElement/readyState
+  // Don't load audio if it's already loaded because that causes it to go back to the beginning.
+  if (this.audioEl.readyState != 4) await this.audioEl.load();
   this.audioEl.play();
 };
 
